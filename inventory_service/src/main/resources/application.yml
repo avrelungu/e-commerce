@@ -1,6 +1,6 @@
 spring:
   application:
-    name: order-service
+    name: inventory-service
 
   kafka:
     bootstrap-servers: localhost:9092
@@ -11,7 +11,7 @@ spring:
       acks: all
 
     consumer:
-      group-id: order-service-group
+      group-id: inventory-service-group
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
@@ -19,4 +19,4 @@ spring:
         spring.json.trusted.packages: "*"
 
 server:
-  port: 8081
+  port: 8082

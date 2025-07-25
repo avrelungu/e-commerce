@@ -16,7 +16,9 @@ public class OrderServiceApplication {
 	@Bean
 	CommandLineRunner commandLineRunner(KafkaTemplate<String, String> kafkaTemplate) {
 		return args -> {
-			kafkaTemplate.send("orders", "Hello kafkaa");
+			for (int i = 0; i < 100; i++) {
+				kafkaTemplate.send("orders", "Hello kafkaa :) chill" + i);
+			}
 		};
 	}
 }
