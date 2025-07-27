@@ -10,16 +10,8 @@ import org.springframework.kafka.config.TopicBuilder;
 @Configuration
 public class KafkaConfig {
     @Bean
-    public NewTopic ordersTopic() {
-        return TopicBuilder.name("orders")
-                .partitions(3)
-                .replicas(1)
-                .build();
-    }
-
-    @Bean
     public NewTopic orderEventsTopic() {
-        return TopicBuilder.name("order-events")
+        return TopicBuilder.name(OrderTopic.ORDER_EVENTS.getTopicName())
                 .partitions(3)
                 .replicas(1)
                 .build();
