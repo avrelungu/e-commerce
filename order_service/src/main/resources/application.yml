@@ -2,6 +2,17 @@ spring:
   application:
     name: order-service
 
+  sql:
+    init:
+      mode: always
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/order_service
+    username: myuser
+    password: secret
+
+
   kafka:
     bootstrap-servers: localhost:9092
     

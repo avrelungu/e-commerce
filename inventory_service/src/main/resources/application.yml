@@ -2,6 +2,22 @@ spring:
   application:
     name: inventory-service
 
+  sql:
+    init:
+      mode: always
+      schema-locations: schema.sql
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5433/inventory_service
+    username: myuser
+    password: secret
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+
   kafka:
     bootstrap-servers: localhost:9092
     
@@ -20,3 +36,11 @@ spring:
 
 server:
   port: 8082
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: DEBUG
+    com.example.inventory_service: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
