@@ -1,8 +1,11 @@
 package com.example.order_service.event;
 
+import lombok.Data;
+
 import java.time.Instant;
 import java.util.UUID;
 
+@Data
 public abstract class DomainEvent {
     public final String eventId = UUID.randomUUID().toString();
 
@@ -10,23 +13,14 @@ public abstract class DomainEvent {
     
     private final String aggregateId;
 
-    protected DomainEvent(String aggregateId) {
+    public Object payload;
+
+    protected DomainEvent(String aggregateId, Object payload) {
         this.aggregateId = aggregateId;
+        this.payload = payload;
     }
 
     public abstract String getEventType();
 
     public abstract String getTopic();
-
-    public String getEventId() {
-        return eventId;
-    }
-
-    public Instant getOccurredOn() {
-        return occurredOn;
-    }
-
-    public String getAggregateId() {
-        return aggregateId;
-    }
 }

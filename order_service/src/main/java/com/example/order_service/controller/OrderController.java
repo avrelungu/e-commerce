@@ -1,7 +1,7 @@
 package com.example.order_service.controller;
 
 import com.example.order_service.dto.CreateOrderDto;
-import com.example.order_service.dto.OrderDto;
+import com.example.order_service.exceptions.AppException;
 import com.example.order_service.service.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +20,7 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createOrder(@RequestBody CreateOrderDto orderDto) {
+    public ResponseEntity<Void> createOrder(@RequestBody CreateOrderDto orderDto) throws AppException {
         orderService.createOrder(orderDto);
 
         return ResponseEntity.ok().build();

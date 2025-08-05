@@ -1,18 +1,22 @@
 package com.example.order_service.event;
 
-public class OrderCreated extends DomainEvent {
+import com.example.order_service.dto.OrderDto;
 
-    protected OrderCreated(String aggregateId) {
-        super(aggregateId);
+public class OrderCreated extends DomainEvent {
+    private final String orderCreateTopic;
+
+    public OrderCreated(String aggregateId, String orderCreateTopic, OrderDto order) {
+        super(aggregateId, order);
+        this.orderCreateTopic = orderCreateTopic;
     }
 
     @Override
     public String getEventType() {
-        return "";
+        return this.orderCreateTopic;
     }
 
     @Override
     public String getTopic() {
-        return "";
+        return this. orderCreateTopic;
     }
 }

@@ -25,7 +25,7 @@ public class Order {
     private UUID customerId;
 
     @Column(nullable = false, name = "status")
-    private String status;
+    private String status = "PENDING";
 
     @Column(name = "total_amount", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalAmount;
