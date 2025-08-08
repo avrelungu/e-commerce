@@ -18,17 +18,17 @@ public class OrderEvent {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false)
+    @JoinColumn(name = "order_id")
     private Order order;
 
-    @Column(name = "event_type", nullable = false, length = 50)
+    @Column(name = "event_type", length = 50)
     private String eventType;
 
     @Convert(converter = JsonNodeConverter.class)
     @ColumnTransformer(write = "?::jsonb")
-    @Column(name = "event_payload", nullable = false, columnDefinition = "jsonb")
+    @Column(name = "event_payload", columnDefinition = "jsonb")
     private JsonNode eventPayload;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 }

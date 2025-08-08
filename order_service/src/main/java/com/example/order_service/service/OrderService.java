@@ -23,7 +23,6 @@ import java.util.List;
 @Service
 @Slf4j
 public class OrderService {
-    private final InventoryService inventoryService;
     private final OrderItemMapper orderItemMapper;
     private final OrderItemRepository orderItemRepository;
     @Value("${inventory.products.tax-rate}")
@@ -45,66 +44,35 @@ public class OrderService {
             OrderRepository orderRepository,
             OrderNumberGenerator orderNumberGenerator,
             EventPublisher eventPublisher,
-            InventoryService inventoryService,
             OrderItemMapper orderItemMapper, OrderItemRepository orderItemRepository) {
         this.orderMapper = orderMapper;
         this.orderRepository = orderRepository;
         this.orderNumberGenerator = orderNumberGenerator;
         this.eventPublisher = eventPublisher;
-        this.inventoryService = inventoryService;
         this.orderItemMapper = orderItemMapper;
         this.orderItemRepository = orderItemRepository;
     }
 
     public void createOrder(CreateOrderDto orderDto) throws AppException {
-        List<OrderItemsAvailableInventoryDto> orderItemsAvailableInventoryDtos = inventoryService.checkOrderItemsInventory(orderDto);
+        Order order = buildOrder(orderDto);
 
-        assert orderItemsAvailableInventoryDtos != null;
+        List<OrderItem> itemList = orderItemMapper.toOrderItemList(orderDto.getItems());
 
-        BigDecimal taxAmount = getTaxAmount(orderItemsAvailableInventoryDtos);
+        itemList.forEach(orderItem -> orderItem.setOrder(order));
 
-        BigDecimal subTotal = getSubTotal(orderItemsAvailableInventoryDtos);
-
-        Order order = buildOrder(orderDto, subTotal, taxAmount);
-
-        log.info("Order Items from inventory: {}", orderItemsAvailableInventoryDtos.toString());
-        
-        log.info("Order: {}", order);
+        order.setOrderItems(itemList);
 
         orderRepository.save(order);
+        orderItemRepository.saveAll(itemList);
 
-        List<OrderItem> orderItems= orderItemRepository.saveAll(getOrderItemList(orderItemsAvailableInventoryDtos, order));
+        OrderDto orderCreatePayload = orderMapper.toOrderDto(order);
 
-        OrderDto orderCreatePayload = buildOrderCreateEventPayload(order, orderItems);
-
-        eventPublisher.publish(new OrderCreated(order.getOrderNumber(), orderCreateTopic, orderCreatePayload));
+        eventPublisher.publish(new OrderCreated(orderCreateTopic, orderCreatePayload));
     }
 
-    private OrderDto buildOrderCreateEventPayload(Order order, List<OrderItem> orderItems) {
-        OrderDto orderDto = orderMapper.toOrderDto(order);
-        orderDto.setItems(orderItems.stream()
-                .map(orderItemMapper::toOrderItemDto)
-                .toList());
-
-        return orderDto;
-    }
-
-    private List<OrderItem> getOrderItemList(List<OrderItemsAvailableInventoryDto> orderItemsAvailableInventoryDtos, Order order) {
-        return orderItemsAvailableInventoryDtos.stream()
-                .map(orderItemMapper::toOrderItem)
-                .map(orderItem -> {
-                    orderItem.setOrder(order);
-                    return orderItem;
-                })
-                .toList();
-    }
-
-    private Order buildOrder(CreateOrderDto orderDto, BigDecimal subTotal, BigDecimal taxAmount) {
+    private Order buildOrder(CreateOrderDto orderDto) {
         Order order = orderMapper.toOrderFromCreateOrderDto(orderDto);
         order.setOrderNumber(orderNumberGenerator.generateOrderNumber());
-        order.setTotalAmount(subTotal.add(taxAmount));
-        order.setTaxAmount(taxAmount);
-        order.setShippingAmount(taxAmount); // TODO: actually calculate the shipping amount
 
         return order;
     }

@@ -7,9 +7,4 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class StockReservationService {
-
-    @KafkaListener(topics = "${order.events.order-created}")
-    public void orderCreateListener(String event) {
-        log.info("Order created from inventory: {}: ", event);
-    }
 }

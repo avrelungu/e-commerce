@@ -12,5 +12,6 @@ public interface OrderMapper {
     Order toOrderFromCreateOrderDto(CreateOrderDto orderDto);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "items", source = "order.orderItems")
     OrderDto toOrderDto(Order order);
 }

@@ -15,21 +15,21 @@ public class OrderItem {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false)
+    @JoinColumn(name = "order_id")
     private Order order;
 
-    @Column(name = "product_id", nullable = false)
+    @Column(name = "product_id")
     private UUID productId;
 
-    @Column(name = "product_name", nullable = false)
+    @Column(name = "product_name")
     private String productName;
 
-    @Column(name = "quantity", nullable = false)
+    @Column(name = "quantity")
     private Integer quantity;
 
-    @Column(name = "unit_price", nullable = false, precision = 10, scale = 2)
+    @Column(name = "unit_price", precision = 10, scale = 2)
     private BigDecimal unitPrice;
 
-    @Column(name = "total_price", nullable = false, precision = 10, scale = 2)
+    @Column(name = "total_price", precision = 10, scale = 2)
     private BigDecimal totalPrice;
 }

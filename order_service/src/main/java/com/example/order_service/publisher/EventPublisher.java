@@ -19,7 +19,7 @@ public class EventPublisher {
         log.info("Publishing event: {}, {}, {}", event.getEventType(), event.getEventId(), event.getTopic());
 
         try {
-            kafkaTemplate.send(event.getTopic(), event.getAggregateId(), event.toString())
+            kafkaTemplate.send(event.getTopic(), event.toString())
                     .whenComplete((result, exception) -> {
                         if (exception != null) {
                             log.error("Error publishing event", exception);

@@ -5,8 +5,8 @@ import com.example.order_service.dto.OrderDto;
 public class OrderCreated extends DomainEvent {
     private final String orderCreateTopic;
 
-    public OrderCreated(String aggregateId, String orderCreateTopic, OrderDto order) {
-        super(aggregateId, order);
+    public OrderCreated(String orderCreateTopic, OrderDto order) {
+        super(order);
         this.orderCreateTopic = orderCreateTopic;
     }
 

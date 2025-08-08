@@ -1,16 +1,15 @@
 package com.example.inventory_service.consumer;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class OrderEventConsumer {
 
-    @KafkaListener(
-            topics = "orders",
-            groupId = "inventory-service-group"
-    )
-    public void orderConsumer(String event) {
-        System.out.println(event + " recevied and consumed");
+    @KafkaListener(topics = "${order.events.order-created}")
+    public void orderCreateListener(String event) {
+        log.info("Order created from inventory: {}: ", event);
     }
 }

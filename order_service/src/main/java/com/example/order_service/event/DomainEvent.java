@@ -10,13 +10,10 @@ public abstract class DomainEvent {
     public final String eventId = UUID.randomUUID().toString();
 
     private final Instant occurredOn = Instant.now();
-    
-    private final String aggregateId;
 
     public Object payload;
 
-    protected DomainEvent(String aggregateId, Object payload) {
-        this.aggregateId = aggregateId;
+    protected DomainEvent(Object payload) {
         this.payload = payload;
     }
 
