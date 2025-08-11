@@ -1,0 +1,163 @@
+[
+  {
+    "namespace": "com.example.events.common",
+    "type": "record",
+    "name": "Money",
+    "fields": [
+      {
+        "name": "amount",
+        "type": {
+          "type": "bytes",
+          "logicalType": "decimal",
+          "precision": 10,
+          "scale": 2
+        }
+      },
+      {
+        "name": "currency",
+        "type": "string",
+        "default": "USD"
+      }
+    ]
+  },
+  {
+    "namespace": "com.example.events.common",
+    "type": "record",
+    "name": "Address",
+    "fields": [
+      {
+        "name": "street",
+        "type": "string"
+      },
+      {
+        "name": "city",
+        "type": "string"
+      },
+      {
+        "name": "state",
+        "type": "string"
+      },
+      {
+        "name": "zipCode",
+        "type": "string"
+      },
+      {
+        "name": "country",
+        "type": "string"
+      }
+    ]
+  },
+  {
+    "namespace": "com.example.events.order",
+    "type": "record",
+    "name": "OrderItem",
+    "fields": [
+      {
+        "name": "productId",
+        "type": "string",
+        "doc": "UUID of the product"
+      },
+      {
+        "name": "productName",
+        "type": "string"
+      },
+      {
+        "name": "quantity",
+        "type": "int"
+      },
+      {
+        "name": "unitPrice",
+        "type": "com.example.events.common.Money"
+      },
+      {
+        "name": "totalPrice",
+        "type": "com.example.events.common.Money"
+      }
+    ]
+  },
+  {
+    "namespace": "com.example.events.order",
+    "type": "record",
+    "name": "OrderCreatedEvent",
+    "doc": "Event published when a new order is created",
+    "fields": [
+      {
+        "name": "eventId",
+        "type": "string",
+        "doc": "Unique identifier for this event"
+      },
+      {
+        "name": "timestamp",
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      {
+        "name": "orderId",
+        "type": "string"
+      },
+      {
+        "name": "orderNumber",
+        "type": "string"
+      },
+      {
+        "name": "customerId",
+        "type": "string"
+      },
+      {
+        "name": "items",
+        "type": {
+          "type": "array",
+          "items": "OrderItem"
+        }
+      },
+      {
+        "name": "totalAmount",
+        "type": "com.example.events.common.Money"
+      },
+      {
+        "name": "taxAmount",
+        "type": "com.example.events.common.Money"
+      },
+      {
+        "name": "shippingAmount",
+        "type": "com.example.events.common.Money"
+      },
+      {
+        "name": "shippingAddress",
+        "type": "com.example.events.common.Address"
+      }
+    ]
+  },
+  {
+    "namespace": "com.example.events.order",
+    "type": "record",
+    "name": "OrderCancelledEvent",
+    "fields": [
+      {
+        "name": "eventId",
+        "type": "string"
+      },
+      {
+        "name": "timestamp",
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      {
+        "name": "orderId",
+        "type": "string"
+      },
+      {
+        "name": "reason",
+        "type": "string"
+      },
+      {
+        "name": "cancelledBy",
+        "type": "string"
+      },
+      {
+        "name": "correlationId",
+        "type": "string"
+      }
+    ]
+  }
+]

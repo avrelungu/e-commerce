@@ -5,6 +5,7 @@ import lombok.Getter;
 @Getter
 public enum OrderTopic {
     ORDER_EVENTS("order-events"),
+    INVENTORY_EVENTS("inventory-events"),
     PAYMENT_EVENTS("payment-events"),
     SHIPPING_EVENTS("shipping-events");
 

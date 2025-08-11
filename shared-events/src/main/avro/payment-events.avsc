@@ -1,0 +1,101 @@
+[
+  {
+    "namespace": "com.example.events.payment",
+    "type": "record",
+    "name": "PaymentProcessedEvent",
+    "fields": [
+      {
+        "name": "eventId",
+        "type": "string"
+      },
+      {
+        "name": "timestamp",
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      {
+        "name": "paymentId",
+        "type": "string"
+      },
+      {
+        "name": "orderId",
+        "type": "string"
+      },
+      {
+        "name": "amount",
+        "type": "com.example.events.common.Money"
+      },
+      {
+        "name": "paymentMethod",
+        "type": {
+          "type": "enum",
+          "name": "PaymentMethod",
+          "symbols": ["CREDIT_CARD", "DEBIT_CARD", "PAYPAL", "APPLE_PAY", "GOOGLE_PAY"]
+        }
+      },
+      {
+        "name": "transactionId",
+        "type": "string"
+      },
+      {
+        "name": "correlationId",
+        "type": "string"
+      }
+    ]
+  },
+  {
+    "namespace": "com.example.events.payment",
+    "type": "record",
+    "name": "PaymentFailedEvent",
+    "fields": [
+      {
+        "name": "eventId",
+        "type": "string"
+      },
+      {
+        "name": "timestamp",
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      {
+        "name": "orderId",
+        "type": "string"
+      },
+      {
+        "name": "amount",
+        "type": "com.example.events.common.Money"
+      },
+      {
+        "name": "failureReason",
+        "type": {
+          "type": "enum",
+          "name": "PaymentFailureReason",
+          "symbols": [
+            "INSUFFICIENT_FUNDS",
+            "CARD_DECLINED",
+            "EXPIRED_CARD",
+            "INVALID_CARD",
+            "PROCESSING_ERROR",
+            "FRAUD_DETECTED"
+          ]
+        }
+      },
+      {
+        "name": "attemptNumber",
+        "type": "int"
+      },
+      {
+        "name": "maxAttempts",
+        "type": "int"
+      },
+      {
+        "name": "canRetry",
+        "type": "boolean"
+      },
+      {
+        "name": "correlationId",
+        "type": "string"
+      }
+    ]
+  }
+]

@@ -1,0 +1,131 @@
+[
+  {
+    "namespace": "com.example.events.inventory",
+    "type": "record",
+    "name": "StockReservedEvent",
+    "fields": [
+      {
+        "name": "eventId",
+        "type": "string"
+      },
+      {
+        "name": "timestamp",
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      {
+        "name": "orderId",
+        "type": "string"
+      },
+      {
+        "name": "reservations",
+        "type": {
+          "type": "array",
+          "items": {
+            "type": "record",
+            "name": "StockReservation",
+            "fields": [
+              {
+                "name": "productId",
+                "type": "string"
+              },
+              {
+                "name": "quantity",
+                "type": "int"
+              },
+              {
+                "name": "reservationId",
+                "type": "string"
+              },
+              {
+                "name": "expiresAt",
+                "type": "long",
+                "logicalType": "timestamp-millis"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "correlationId",
+        "type": "string"
+      }
+    ]
+  },
+  {
+    "namespace": "com.example.events.inventory",
+    "type": "record",
+    "name": "StockReleasedEvent",
+    "fields": [
+      {
+        "name": "eventId",
+        "type": "string"
+      },
+      {
+        "name": "timestamp",
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      {
+        "name": "orderId",
+        "type": "string"
+      },
+      {
+        "name": "productId",
+        "type": "string"
+      },
+      {
+        "name": "quantity",
+        "type": "int"
+      },
+      {
+        "name": "reason",
+        "type": {
+          "type": "enum",
+          "name": "ReleaseReason",
+          "symbols": ["PAYMENT_FAILED", "ORDER_CANCELLED", "RESERVATION_EXPIRED"]
+        }
+      },
+      {
+        "name": "correlationId",
+        "type": "string"
+      }
+    ]
+  },
+  {
+    "namespace": "com.example.events.inventory",
+    "type": "record",
+    "name": "OutOfStockEvent",
+    "fields": [
+      {
+        "name": "eventId",
+        "type": "string"
+      },
+      {
+        "name": "timestamp",
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      {
+        "name": "orderId",
+        "type": "string"
+      },
+      {
+        "name": "productId",
+        "type": "string"
+      },
+      {
+        "name": "requestedQuantity",
+        "type": "int"
+      },
+      {
+        "name": "availableQuantity",
+        "type": "int"
+      },
+      {
+        "name": "correlationId",
+        "type": "string"
+      }
+    ]
+  }
+]
