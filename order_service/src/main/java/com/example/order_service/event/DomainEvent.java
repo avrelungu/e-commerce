@@ -3,18 +3,18 @@ package com.example.order_service.event;
 import lombok.Data;
 
 import java.time.Instant;
-import java.util.UUID;
 
 @Data
 public abstract class DomainEvent {
-    public final String eventId = UUID.randomUUID().toString();
-
-    private final Instant occurredOn = Instant.now();
+    public String eventId;
 
     public Object payload;
 
-    protected DomainEvent(Object payload) {
+    private final Instant occurredOn = Instant.now();
+
+    protected DomainEvent(Object payload, String eventId) {
         this.payload = payload;
+        this.eventId = eventId;
     }
 
     public abstract String getEventType();

@@ -2,7 +2,6 @@ package com.example.order_service.service;
 
 import com.example.order_service.dto.CreateOrderDto;
 import com.example.order_service.dto.OrderItemsAvailableInventoryDto;
-import com.example.order_service.dto.OrderItemDto;
 import com.example.order_service.exceptions.AppException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

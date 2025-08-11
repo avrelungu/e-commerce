@@ -1,8 +1,7 @@
 package com.example.order_service.service;
 
 import com.example.order_service.dto.CreateOrderDto;
-import com.example.order_service.dto.OrderDto;
-import com.example.order_service.dto.OrderItemsAvailableInventoryDto;
+import com.example.order_service.dto.OrderItemDto;
 import com.example.order_service.event.OrderCreated;
 import com.example.order_service.exceptions.AppException;
 import com.example.order_service.mapper.OrderItemMapper;
@@ -17,16 +16,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 
 @Service
 @Slf4j
 public class OrderService {
     private final OrderItemMapper orderItemMapper;
-    private final OrderItemRepository orderItemRepository;
+
     @Value("${inventory.products.tax-rate}")
-    private Integer SALES_TAX_RATE;
+    private BigDecimal SALES_TAX_RATE;
 
     @Value("${order.events.order-created}")
     private String orderCreateTopic;
@@ -44,50 +42,43 @@ public class OrderService {
             OrderRepository orderRepository,
             OrderNumberGenerator orderNumberGenerator,
             EventPublisher eventPublisher,
-            OrderItemMapper orderItemMapper, OrderItemRepository orderItemRepository) {
+            OrderItemMapper orderItemMapper
+    ) {
         this.orderMapper = orderMapper;
         this.orderRepository = orderRepository;
         this.orderNumberGenerator = orderNumberGenerator;
         this.eventPublisher = eventPublisher;
         this.orderItemMapper = orderItemMapper;
-        this.orderItemRepository = orderItemRepository;
     }
 
     public void createOrder(CreateOrderDto orderDto) throws AppException {
         Order order = buildOrder(orderDto);
 
-        List<OrderItem> itemList = orderItemMapper.toOrderItemList(orderDto.getItems());
-
-        itemList.forEach(orderItem -> orderItem.setOrder(order));
-
-        order.setOrderItems(itemList);
+        log.info("Order: {}", order);
+        log.info("Order ITEMS: {}", order.getOrderItems());
 
         orderRepository.save(order);
-        orderItemRepository.saveAll(itemList);
 
-        OrderDto orderCreatePayload = orderMapper.toOrderDto(order);
-
-        eventPublisher.publish(new OrderCreated(orderCreateTopic, orderCreatePayload));
+        eventPublisher.publish(new OrderCreated(orderCreateTopic, orderDto, order.getId().toString()));
     }
 
     private Order buildOrder(CreateOrderDto orderDto) {
-        Order order = orderMapper.toOrderFromCreateOrderDto(orderDto);
+        Order order = orderMapper.createOrderDtoToOrder(orderDto);
+
+        List<OrderItem> orderItemList = getOrderItems(orderDto.getItems(), order);
+
+        order.setOrderItems(orderItemList);
         order.setOrderNumber(orderNumberGenerator.generateOrderNumber());
+        order.setShippingAmount(orderDto.getPricing().getShippingAmount());
+        order.setTaxAmount(orderDto.getPricing().getTaxAmount());
+        order.setTotalAmount(orderDto.getPricing().getTotalAmount());
 
         return order;
     }
 
-    private static BigDecimal getSubTotal(List<OrderItemsAvailableInventoryDto> orderItemsAvailableInventoryDtos) {
-        return orderItemsAvailableInventoryDtos.stream()
-                .map(OrderItemsAvailableInventoryDto::getTotalPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
-    private BigDecimal getTaxAmount(List<OrderItemsAvailableInventoryDto> orderItemsAvailableInventoryDtos) {
-        return orderItemsAvailableInventoryDtos.stream()
-                .map(inventoryDto -> (inventoryDto.getTotalPrice()
-                        .multiply(BigDecimal.valueOf(SALES_TAX_RATE)))
-                        .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    private List<OrderItem> getOrderItems(List<OrderItemDto> orderItemDtoList, Order order) {
+        return orderItemDtoList.stream()
+                .map(dto -> orderItemMapper.toOrderItem(dto, order))
+                .toList();
     }
 }

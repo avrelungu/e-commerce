@@ -42,4 +42,4 @@ inventory_service:
 
 inventory:
   products:
-    tax-rate: 21
+    tax-rate: 0.21
