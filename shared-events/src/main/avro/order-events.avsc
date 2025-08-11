@@ -1,53 +1,5 @@
 [
   {
-    "namespace": "com.example.events.common",
-    "type": "record",
-    "name": "Money",
-    "fields": [
-      {
-        "name": "amount",
-        "type": {
-          "type": "bytes",
-          "logicalType": "decimal",
-          "precision": 10,
-          "scale": 2
-        }
-      },
-      {
-        "name": "currency",
-        "type": "string",
-        "default": "USD"
-      }
-    ]
-  },
-  {
-    "namespace": "com.example.events.common",
-    "type": "record",
-    "name": "Address",
-    "fields": [
-      {
-        "name": "street",
-        "type": "string"
-      },
-      {
-        "name": "city",
-        "type": "string"
-      },
-      {
-        "name": "state",
-        "type": "string"
-      },
-      {
-        "name": "zipCode",
-        "type": "string"
-      },
-      {
-        "name": "country",
-        "type": "string"
-      }
-    ]
-  },
-  {
     "namespace": "com.example.events.order",
     "type": "record",
     "name": "OrderItem",
@@ -81,11 +33,6 @@
     "name": "OrderCreatedEvent",
     "doc": "Event published when a new order is created",
     "fields": [
-      {
-        "name": "eventId",
-        "type": "string",
-        "doc": "Unique identifier for this event"
-      },
       {
         "name": "timestamp",
         "type": "long",

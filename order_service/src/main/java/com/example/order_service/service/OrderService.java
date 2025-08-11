@@ -4,16 +4,17 @@ import com.example.order_service.dto.CreateOrderDto;
 import com.example.order_service.dto.OrderItemDto;
 import com.example.order_service.event.OrderCreated;
 import com.example.order_service.exceptions.AppException;
+import com.example.order_service.mapper.OrderEventMapper;
 import com.example.order_service.mapper.OrderItemMapper;
 import com.example.order_service.mapper.OrderMapper;
 import com.example.order_service.model.Order;
 import com.example.order_service.model.OrderItem;
 import com.example.order_service.publisher.EventPublisher;
-import com.example.order_service.repository.OrderItemRepository;
 import com.example.order_service.repository.OrderRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import com.example.events.order.OrderCreatedEvent;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -35,6 +36,8 @@ public class OrderService {
 
     private final OrderMapper orderMapper;
 
+    private final OrderEventMapper orderEventMapper;
+
     private final OrderRepository orderRepository;
 
     public OrderService(
@@ -42,13 +45,15 @@ public class OrderService {
             OrderRepository orderRepository,
             OrderNumberGenerator orderNumberGenerator,
             EventPublisher eventPublisher,
-            OrderItemMapper orderItemMapper
+            OrderItemMapper orderItemMapper,
+            OrderEventMapper orderEventMapper
     ) {
         this.orderMapper = orderMapper;
         this.orderRepository = orderRepository;
         this.orderNumberGenerator = orderNumberGenerator;
         this.eventPublisher = eventPublisher;
         this.orderItemMapper = orderItemMapper;
+        this.orderEventMapper = orderEventMapper;
     }
 
     public void createOrder(CreateOrderDto orderDto) throws AppException {
@@ -59,7 +64,11 @@ public class OrderService {
 
         orderRepository.save(order);
 
-        eventPublisher.publish(new OrderCreated(orderCreateTopic, orderDto, order.getId().toString()));
+        OrderCreatedEvent orderCreatedEvent = orderEventMapper.toOrderCreatedEvent(order);
+
+        log.info("Order created event: {}", orderCreatedEvent);
+
+        eventPublisher.publish(new OrderCreated(orderCreateTopic, orderCreatedEvent, order.getId().toString()));
     }
 
     private Order buildOrder(CreateOrderDto orderDto) {

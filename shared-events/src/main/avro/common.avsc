@@ -1,0 +1,50 @@
+[
+  {
+    "namespace": "com.example.events.common",
+    "type": "record",
+    "name": "Money",
+    "fields": [
+      {
+        "name": "amount",
+        "type": {
+          "type": "bytes",
+          "logicalType": "decimal",
+          "precision": 10,
+          "scale": 2
+        }
+      },
+      {
+        "name": "currency",
+        "type": "string",
+        "default": "USD"
+      }
+    ]
+  },
+  {
+    "namespace": "com.example.events.common",
+    "type": "record",
+    "name": "Address",
+    "fields": [
+      {
+        "name": "street",
+        "type": "string"
+      },
+      {
+        "name": "city",
+        "type": "string"
+      },
+      {
+        "name": "state",
+        "type": "string"
+      },
+      {
+        "name": "zipCode",
+        "type": "string"
+      },
+      {
+        "name": "country",
+        "type": "string"
+      }
+    ]
+  }
+]

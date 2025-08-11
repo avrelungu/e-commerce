@@ -12,4 +12,12 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>order_service</name>
 	<description>Order Service</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.example</groupId>
+			<artifactId>shared-events</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
 </project>
