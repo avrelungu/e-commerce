@@ -65,10 +65,11 @@ public class OrderService {
         orderRepository.save(order);
 
         OrderCreatedEvent orderCreatedEvent = orderEventMapper.toOrderCreatedEvent(order);
+        com.example.order_service.dto.event.OrderCreatedEventDto orderCreatedEventDto = orderEventMapper.toDto(orderCreatedEvent);
 
-        log.info("Order created event: {}", orderCreatedEvent);
+        log.info("Order created event DTO: {}", orderCreatedEventDto);
 
-        eventPublisher.publish(new OrderCreated(orderCreateTopic, orderCreatedEvent, order.getId().toString()));
+        eventPublisher.publish(new OrderCreated(orderCreateTopic, orderCreatedEventDto, order.getId().toString()));
     }
 
     private Order buildOrder(CreateOrderDto orderDto) {
