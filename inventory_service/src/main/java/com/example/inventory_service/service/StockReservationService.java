@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,25 +34,27 @@ public class StockReservationService {
     }
     
     @Transactional
-    public boolean reserveStock(UUID orderId, List<ReservationRequestDto> reservationRequests) {
+    public List<StockReservation> reserveStock(UUID orderId, List<ReservationRequestDto> reservationRequests) {
         log.info("Attempting to reserve stock for order: {}", orderId);
         
         try {
             for (ReservationRequestDto request : reservationRequests) {
                 if (!hasAvailableStock(request.getProductId(), request.getQuantity())) {
-                    log.warn("Insufficient stock for product {} - requested: {}, available: {}", 
+                    log.warn("Insufficient stock for product {} - requested: {}, available: {}",
                             request.getProductId(), request.getQuantity(), getAvailableStock(request.getProductId()));
-                    return false;
+                    return List.of();
                 }
             }
-            
+
+            List<StockReservation> createdReservations = new ArrayList<>();
             for (ReservationRequestDto request : reservationRequests) {
-                createReservation(orderId, request.getProductId(), request.getQuantity());
+                StockReservation reservation = createReservation(orderId, request.getProductId(), request.getQuantity());
+                createdReservations.add(reservation);
                 updateInventoryReservedQuantity(request.getProductId(), request.getQuantity());
             }
             
             log.info("Successfully reserved stock for order: {}", orderId);
-            return true;
+            return createdReservations;
             
         } catch (Exception e) {
             log.error("Error reserving stock for order: {}", orderId, e);
@@ -86,7 +89,7 @@ public class StockReservationService {
         return inventory.getAvailableQuantity() - currentlyReserved;
     }
     
-    private void createReservation(UUID orderId, UUID productId, int quantity) {
+    private StockReservation createReservation(UUID orderId, UUID productId, int quantity) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found: " + productId));
         
@@ -98,9 +101,11 @@ public class StockReservationService {
         reservation.setExpiresAt(LocalDateTime.now().plusMinutes(15));
         reservation.setCreatedAt(LocalDateTime.now());
         
-        stockReservationRepository.save(reservation);
+        StockReservation savedReservation = stockReservationRepository.save(reservation);
         log.info("Created stock reservation for order: {}, product: {}, quantity: {}", 
                 orderId, productId, quantity);
+        
+        return savedReservation;
     }
     
     private void updateInventoryReservedQuantity(UUID productId, int quantity) {

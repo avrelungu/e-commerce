@@ -1,6 +1,6 @@
-package com.example.order_service.publisher;
+package com.example.inventory_service.publisher;
 
-import com.example.order_service.event.DomainEvent;
+import com.example.inventory_service.event.DomainEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class EventPublisher {
-
     private final KafkaTemplate<Object, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
 

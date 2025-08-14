@@ -66,42 +66,44 @@ public interface OrderEventMapper {
                 .toList();
     }
 
-    // Convert Avro objects to DTOs for JSON serialization
     default OrderCreatedEventDto toDto(OrderCreatedEvent avroEvent) {
-        OrderCreatedEventDto dto = new OrderCreatedEventDto();
-        dto.setTimestamp(avroEvent.getTimestamp());
-        dto.setOrderId(avroEvent.getOrderId());
-        dto.setOrderNumber(avroEvent.getOrderNumber());
-        dto.setCustomerId(avroEvent.getCustomerId());
-        dto.setItems(avroEvent.getItems().stream().map(this::toDto).toList());
-        dto.setTotalAmount(toDto(avroEvent.getTotalAmount()));
-        dto.setTaxAmount(toDto(avroEvent.getTaxAmount()));
-        dto.setShippingAmount(toDto(avroEvent.getShippingAmount()));
-        dto.setShippingAddress(toDtoAddress(avroEvent.getShippingAddress()));
-        return dto;
+        return new OrderCreatedEventDto(
+            avroEvent.getTimestamp(),
+            avroEvent.getOrderId(),
+            avroEvent.getOrderNumber(),
+            avroEvent.getCustomerId(),
+            avroEvent.getItems().stream().map(this::toDto).toList(),
+            toDto(avroEvent.getTotalAmount()),
+            toDto(avroEvent.getTaxAmount()),
+            toDto(avroEvent.getShippingAmount()),
+            toDtoAddress(avroEvent.getShippingAddress())
+        );
     }
 
     default OrderItemDto toDto(OrderItem avroItem) {
-        OrderItemDto dto = new OrderItemDto();
-        dto.setProductId(avroItem.getProductId());
-        dto.setProductName(avroItem.getProductName());
-        dto.setQuantity(avroItem.getQuantity());
-        dto.setUnitPrice(toDto(avroItem.getUnitPrice()));
-        dto.setTotalPrice(toDto(avroItem.getTotalPrice()));
-        return dto;
+        return new OrderItemDto(
+            avroItem.getProductId(),
+            avroItem.getProductName(),
+            avroItem.getQuantity(),
+            toDto(avroItem.getUnitPrice()),
+            toDto(avroItem.getTotalPrice())
+        );
     }
 
     default MoneyDto toDto(Money avroMoney) {
-        return new MoneyDto(avroMoney.getAmount(), avroMoney.getCurrency());
+        return new MoneyDto(
+                avroMoney.getAmount(),
+                avroMoney.getCurrency()
+        );
     }
 
     default com.example.order_service.dto.event.AddressDto toDtoAddress(Address avroAddress) {
-        com.example.order_service.dto.event.AddressDto dto = new com.example.order_service.dto.event.AddressDto();
-        dto.setStreet(avroAddress.getStreet());
-        dto.setCity(avroAddress.getCity());
-        dto.setState(avroAddress.getState());
-        dto.setZipCode(avroAddress.getZipCode());
-        dto.setCountry(avroAddress.getCountry());
-        return dto;
+        return new com.example.order_service.dto.event.AddressDto(
+            avroAddress.getStreet(),
+            avroAddress.getCity(),
+            avroAddress.getState(),
+            avroAddress.getZipCode(),
+            avroAddress.getCountry()
+        );
     }
 }

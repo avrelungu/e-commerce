@@ -2,6 +2,7 @@ package com.example.order_service.service;
 
 import com.example.order_service.dto.CreateOrderDto;
 import com.example.order_service.dto.OrderItemDto;
+import com.example.order_service.dto.event.OrderCreatedEventDto;
 import com.example.order_service.event.OrderCreated;
 import com.example.order_service.exceptions.AppException;
 import com.example.order_service.mapper.OrderEventMapper;
@@ -24,11 +25,11 @@ import java.util.List;
 public class OrderService {
     private final OrderItemMapper orderItemMapper;
 
-    @Value("${inventory.products.tax-rate}")
-    private BigDecimal SALES_TAX_RATE;
+    @Value("#{kafkaTopics.orderCreated}")
+    private String orderCreatedTopic;
 
-    @Value("${order.events.order-created}")
-    private String orderCreateTopic;
+    @Value("${inventory_service.products.tax-rate}")
+    private BigDecimal SALES_TAX_RATE;
 
     private final EventPublisher eventPublisher;
 
@@ -65,11 +66,11 @@ public class OrderService {
         orderRepository.save(order);
 
         OrderCreatedEvent orderCreatedEvent = orderEventMapper.toOrderCreatedEvent(order);
-        com.example.order_service.dto.event.OrderCreatedEventDto orderCreatedEventDto = orderEventMapper.toDto(orderCreatedEvent);
+        OrderCreatedEventDto orderCreatedEventDto = orderEventMapper.toDto(orderCreatedEvent);
 
         log.info("Order created event DTO: {}", orderCreatedEventDto);
 
-        eventPublisher.publish(new OrderCreated(orderCreateTopic, orderCreatedEventDto, order.getId().toString()));
+        eventPublisher.publish(new OrderCreated(orderCreatedTopic, orderCreatedEventDto, order.getId().toString()));
     }
 
     private Order buildOrder(CreateOrderDto orderDto) {

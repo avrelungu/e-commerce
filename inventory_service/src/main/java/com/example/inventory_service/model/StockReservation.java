@@ -25,7 +25,7 @@ public class StockReservation {
     private Integer quantity;
 
     @Column(name = "status", nullable = false, length = 20)
-    private String status; // RESERVED, CONFIRMED, RELEASED
+    private String status;
 
     @Column(name = "expires_at", nullable = false)
     private LocalDateTime expiresAt;
