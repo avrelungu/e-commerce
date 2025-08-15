@@ -22,7 +22,7 @@ import java.util.UUID;
 
 @Component
 @Slf4j
-public class OrderEventConsumer {
+public class OrderCreatedEventConsumer {
     @Value("#{kafkaTopics.stockReserved}")
     private String stockReservedTopic;
 
@@ -31,7 +31,7 @@ public class OrderEventConsumer {
     private final EventPublisher eventPublisher;
     private final ObjectMapper objectMapper;
 
-    public OrderEventConsumer(StockReservationService stockReservationService, StockReservationMapper stockReservationMapper, EventPublisher eventPublisher, ObjectMapper objectMapper) {
+    public OrderCreatedEventConsumer(StockReservationService stockReservationService, StockReservationMapper stockReservationMapper, EventPublisher eventPublisher, ObjectMapper objectMapper) {
         this.stockReservationService = stockReservationService;
         this.stockReservationMapper = stockReservationMapper;
         this.eventPublisher = eventPublisher;
