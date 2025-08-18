@@ -42,11 +42,3 @@ kafka:
 
 server:
   port: 8082
-
-logging:
-  level:
-    root: INFO
-    org.springframework.web: DEBUG
-    com.example.inventory_service: DEBUG
-  pattern:
-    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

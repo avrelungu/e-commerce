@@ -10,7 +10,6 @@ import org.mapstruct.Mapping;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface StockReservationMapper {
@@ -28,7 +27,7 @@ public interface StockReservationMapper {
         return StockReservedEvent.newBuilder()
                 .setEventId(eventId)
                 .setOrderId(orderId)
-                .setCorrelationId(orderId)
+                .setAggregateId(orderId)
                 .setReservations(stockReservations.stream().map(this::toStockReservation).toList())
                 .setTimestamp(map(LocalDateTime.now()))
                 .build();

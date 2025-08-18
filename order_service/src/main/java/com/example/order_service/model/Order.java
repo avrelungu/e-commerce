@@ -54,4 +54,21 @@ public class Order {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
+
+    // Temporary payment fields (cleared after payment processing)
+    @Column(name = "payment_method_token", nullable = true)
+    private String paymentMethodToken;
+
+    @Column(name = "payment_method_type", nullable = true)
+    private String paymentMethodType;
+
+    // Permanent payment fields (kept for records)
+    @Column(name = "payment_status", nullable = true)
+    private String paymentStatus;
+
+    @Column(name = "transaction_id", nullable = true)
+    private String transactionId;
+
+    @Column(name = "last_four_digits", nullable = true)
+    private String lastFourDigits;
 }

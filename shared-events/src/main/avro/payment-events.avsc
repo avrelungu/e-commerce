@@ -2,17 +2,31 @@
   {
     "namespace": "com.example.events.payment",
     "type": "record",
-    "name": "PaymentProcessedEvent",
+    "name": "PaymentRequestEvent",
     "fields": [
       {
-        "name": "eventId",
+        "name": "orderId",
         "type": "string"
       },
       {
-        "name": "timestamp",
-        "type": "long",
-        "logicalType": "timestamp-millis"
+        "name": "amount",
+        "type": "com.example.events.common.Money"
       },
+      {
+        "name": "paymentMethodToken",
+        "type": "string"
+      },
+      {
+        "name": "paymentMethodType",
+        "type": "string"
+      }
+    ]
+  },
+  {
+    "namespace": "com.example.events.payment",
+    "type": "record",
+    "name": "PaymentProcessedEvent",
+    "fields": [
       {
         "name": "paymentId",
         "type": "string"
@@ -36,10 +50,6 @@
       {
         "name": "transactionId",
         "type": "string"
-      },
-      {
-        "name": "correlationId",
-        "type": "string"
       }
     ]
   },
@@ -48,15 +58,6 @@
     "type": "record",
     "name": "PaymentFailedEvent",
     "fields": [
-      {
-        "name": "eventId",
-        "type": "string"
-      },
-      {
-        "name": "timestamp",
-        "type": "long",
-        "logicalType": "timestamp-millis"
-      },
       {
         "name": "orderId",
         "type": "string"
@@ -91,10 +92,6 @@
       {
         "name": "canRetry",
         "type": "boolean"
-      },
-      {
-        "name": "correlationId",
-        "type": "string"
       }
     ]
   }

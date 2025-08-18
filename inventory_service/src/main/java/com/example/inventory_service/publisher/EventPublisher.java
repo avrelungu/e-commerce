@@ -24,9 +24,9 @@ public class EventPublisher {
         try {
             String domainEvent = objectMapper.writeValueAsString(event);
 
-            log.info("Publishing event: {}, {}, {}", event.getEventType(), domainEvent, event.getTopic());
+            log.info("Publishing event: {}, {}", domainEvent, event.getTopic());
 
-            kafkaTemplate.send(event.getTopic(), event.getEventId() , domainEvent)
+            kafkaTemplate.send(event.getTopic(), event.getAggregateId() , domainEvent)
                     .whenComplete((result, exception) -> {
                         if (exception != null) {
                             log.error("Error publishing event", exception);

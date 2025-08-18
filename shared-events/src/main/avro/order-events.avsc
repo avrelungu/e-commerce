@@ -34,11 +34,6 @@
     "doc": "Event published when a new order is created",
     "fields": [
       {
-        "name": "timestamp",
-        "type": "long",
-        "logicalType": "timestamp-millis"
-      },
-      {
         "name": "orderId",
         "type": "string"
       },
@@ -81,15 +76,6 @@
     "name": "OrderCancelledEvent",
     "fields": [
       {
-        "name": "eventId",
-        "type": "string"
-      },
-      {
-        "name": "timestamp",
-        "type": "long",
-        "logicalType": "timestamp-millis"
-      },
-      {
         "name": "orderId",
         "type": "string"
       },
@@ -99,10 +85,6 @@
       },
       {
         "name": "cancelledBy",
-        "type": "string"
-      },
-      {
-        "name": "correlationId",
         "type": "string"
       }
     ]

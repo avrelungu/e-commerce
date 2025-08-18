@@ -27,7 +27,7 @@ public class EventPublisher {
 
             log.info("Publishing event: {}, {}, {}", event.getEventType(), domainEvent, event.getTopic());
 
-            kafkaTemplate.send(event.getTopic(), event.getEventId() , domainEvent)
+            kafkaTemplate.send(event.getTopic(), event.getPartitionKey() , domainEvent)
                     .whenComplete((result, exception) -> {
                         if (exception != null) {
                             log.error("Error publishing event", exception);

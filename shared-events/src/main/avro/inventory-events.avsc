@@ -5,15 +5,6 @@
     "name": "StockReservedEvent",
     "fields": [
       {
-        "name": "eventId",
-        "type": "string"
-      },
-      {
-        "name": "timestamp",
-        "type": "long",
-        "logicalType": "timestamp-millis"
-      },
-      {
         "name": "orderId",
         "type": "string"
       },
@@ -45,10 +36,6 @@
             ]
           }
         }
-      },
-      {
-        "name": "correlationId",
-        "type": "string"
       }
     ]
   },
@@ -57,15 +44,6 @@
     "type": "record",
     "name": "StockReleasedEvent",
     "fields": [
-      {
-        "name": "eventId",
-        "type": "string"
-      },
-      {
-        "name": "timestamp",
-        "type": "long",
-        "logicalType": "timestamp-millis"
-      },
       {
         "name": "orderId",
         "type": "string"
@@ -85,10 +63,6 @@
           "name": "ReleaseReason",
           "symbols": ["PAYMENT_FAILED", "ORDER_CANCELLED", "RESERVATION_EXPIRED"]
         }
-      },
-      {
-        "name": "correlationId",
-        "type": "string"
       }
     ]
   },
@@ -97,15 +71,6 @@
     "type": "record",
     "name": "OutOfStockEvent",
     "fields": [
-      {
-        "name": "eventId",
-        "type": "string"
-      },
-      {
-        "name": "timestamp",
-        "type": "long",
-        "logicalType": "timestamp-millis"
-      },
       {
         "name": "orderId",
         "type": "string"
@@ -121,10 +86,6 @@
       {
         "name": "availableQuantity",
         "type": "int"
-      },
-      {
-        "name": "correlationId",
-        "type": "string"
       }
     ]
   }

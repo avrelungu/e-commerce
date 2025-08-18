@@ -9,6 +9,13 @@ CREATE TABLE order_service.orders(
     tax_amount DECIMAL(10, 2),
     shipping_amount DECIMAL(10, 2),
     shipping_address JSONB,
+    -- Temporary payment fields (cleared after processing)
+    payment_method_token VARCHAR(255) NULL,
+    payment_method_type VARCHAR(50) NULL,
+    -- Permanent payment fields (kept for records)
+    payment_status VARCHAR(50) NULL,
+    transaction_id VARCHAR(255) NULL,
+    last_four_digits VARCHAR(4) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

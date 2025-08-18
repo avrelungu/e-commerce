@@ -23,7 +23,6 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface OrderEventMapper {
     @Mapping(target = "orderId", source = "id")
-    @Mapping(target = "timestamp", source = "createdAt")
     @Mapping(target = "items", source = "orderItems")
     OrderCreatedEvent toOrderCreatedEvent(Order order);
 
@@ -68,7 +67,6 @@ public interface OrderEventMapper {
 
     default OrderCreatedEventDto toDto(OrderCreatedEvent avroEvent) {
         return new OrderCreatedEventDto(
-            avroEvent.getTimestamp(),
             avroEvent.getOrderId(),
             avroEvent.getOrderNumber(),
             avroEvent.getCustomerId(),

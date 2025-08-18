@@ -9,9 +9,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class OrderCreatedEventDto {
-    @JsonProperty("timestamp")
-    private long timestamp;
-    
     @JsonProperty("orderId")
     private String orderId;
     

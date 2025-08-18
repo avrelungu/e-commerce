@@ -38,6 +38,7 @@ kafka:
     stock-reserved: "inventory-stock-reserved"
     stock-released: "inventory-stock-released"
     out-of-stock: "inventory-out-of-stock"
+    payment-request: "payment-request"
 
 inventory_service:
   api:

@@ -12,4 +12,5 @@ public class KafkaTopics {
     private String stockReserved;
     private String stockReleased;
     private String outOfStock;
+    private String paymentRequest;
 }

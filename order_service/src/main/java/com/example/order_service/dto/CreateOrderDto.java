@@ -30,8 +30,11 @@ public class CreateOrderDto {
 
     private AddressDto billingAddress;
 
-    @NotEmpty
-    private PaymentMethodDto paymentMethod;
+    @NotBlank
+    private String paymentMethodToken;
+
+    @NotBlank
+    private String paymentMethodType;
 
     @NotEmpty
     private PricingDto pricing;
