@@ -40,6 +40,11 @@ kafka:
     stock-released: "inventory-stock-released"
     out-of-stock: "inventory-out-of-stock"
     payment-request: "payment-request"
+    payment-processed: "payment-processed"
+    payment-failed: "payment-failed"
+
+  retry:
+    max: 3
 
 server:
   port: 8083

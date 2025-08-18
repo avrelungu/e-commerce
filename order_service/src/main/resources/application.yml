@@ -39,6 +39,8 @@ kafka:
     stock-released: "inventory-stock-released"
     out-of-stock: "inventory-out-of-stock"
     payment-request: "payment-request"
+    payment-processed: "payment-processed"
+    payment-failed: "payment-failed"
 
 inventory_service:
   api:

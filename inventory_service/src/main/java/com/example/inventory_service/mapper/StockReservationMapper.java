@@ -25,11 +25,8 @@ public interface StockReservationMapper {
         }
 
         return StockReservedEvent.newBuilder()
-                .setEventId(eventId)
                 .setOrderId(orderId)
-                .setAggregateId(orderId)
                 .setReservations(stockReservations.stream().map(this::toStockReservation).toList())
-                .setTimestamp(map(LocalDateTime.now()))
                 .build();
     };
 

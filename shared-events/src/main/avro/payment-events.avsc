@@ -50,6 +50,14 @@
       {
         "name": "transactionId",
         "type": "string"
+      },
+      {
+        "name": "lastFourDigits",
+        "type": "string"
+      },
+      {
+        "name": "cardBrand",
+        "type": "string"
       }
     ]
   },
@@ -77,7 +85,8 @@
             "EXPIRED_CARD",
             "INVALID_CARD",
             "PROCESSING_ERROR",
-            "FRAUD_DETECTED"
+            "FRAUD_DETECTED",
+            "MAXIMUM_NUMBER_OF_RETRIES_REACHED"
           ]
         }
       },
