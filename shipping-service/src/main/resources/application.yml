@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: shipping-service
+
+  sql:
+    init:
+      mode: never
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5435/shipping_service
+    username: myuser
+    password: secret
+
+
+  kafka:
+    bootstrap-servers: localhost:9092
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+
+    consumer:
+      group-id: order-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+
+kafka:
+  topics:
+    order-created: "order-created"
+    stock-reserved: "inventory-stock-reserved"
+    stock-released: "inventory-stock-released"
+    out-of-stock: "inventory-out-of-stock"
+    payment-request: "payment-request"
+    payment-processed: "payment-processed"
+    payment-failed: "payment-failed"
+
+server:
+  port: 8084
