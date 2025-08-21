@@ -14,32 +14,35 @@ import java.util.UUID;
 
 @Component
 @Slf4j
-public class PaymentProcessedConsumer {
+public class OutOfStockConsumer {
+
     private final ObjectMapper objectMapper;
     private final OrderRepository orderRepository;
 
-    public PaymentProcessedConsumer(ObjectMapper objectMapper, OrderRepository orderRepository) {
+    public OutOfStockConsumer(ObjectMapper objectMapper, OrderRepository orderRepository) {
         this.objectMapper = objectMapper;
         this.orderRepository = orderRepository;
     }
 
-    @KafkaListener(topics = "#{kafkaTopics.paymentProcessed}")
-    public void paymentProcessedConsumer(String paymentProcessedEvent) {
+    @KafkaListener(topics = "#{kafkaTopics.outOfStock}")
+    private void outOfStockConsumer(String outOfStockEvent) {
         try {
-            JsonNode domainEventPayload = objectMapper.readTree(paymentProcessedEvent).get("payload");
+            JsonNode domainEventPayload = objectMapper.readTree(outOfStockEvent).get("payload");
 
             String orderId = domainEventPayload.get("orderId").asText();
-            
+
             Optional<Order> order = orderRepository.findById(UUID.fromString(orderId));
 
-            if (order.isPresent()) {
-                order.get().setStatus(String.valueOf(OrderStatus.PAID));
-                orderRepository.save(order.get());
+            if (order.isEmpty()) {
+                log.error("Order {} not found for outOfStockEvent: {}", orderId, outOfStockEvent);
+
+                return;
             }
 
-            log.info("Domain payment paymentProcessedEvent received: {}", domainEventPayload);
+            order.get().setStatus(OrderStatus.OUT_OF_STOCK.name());
+            orderRepository.save(order.get());
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("Error while processing outOfStockEvent: {}", outOfStockEvent, e);
         }
     }
 }

@@ -39,6 +39,8 @@ kafka:
     stock-reserved: "inventory-stock-reserved"
     stock-released: "inventory-stock-released"
     out-of-stock: "inventory-out-of-stock"
+    payment-processed: "payment-processed"
+    payment-failed: "payment-failed"
 
 server:
   port: 8082

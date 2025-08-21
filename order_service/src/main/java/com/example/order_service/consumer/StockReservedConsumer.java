@@ -39,11 +39,11 @@ public class StockReservedConsumer {
     }
 
     @KafkaListener(topics = "#{kafkaTopics.stockReserved}", groupId = "order-service-inventory-processor")
-    public void stockReservedConsume(String event) throws JsonProcessingException {
+    public void stockReservedConsumer(String stockReservedEvent) throws JsonProcessingException {
         try {
-            log.info("Stock reserved event: {}", event);
+            log.info("Stock reserved stockReservedEvent: {}", stockReservedEvent);
 
-            JsonNode domainEvent = objectMapper.readTree(event);
+            JsonNode domainEvent = objectMapper.readTree(stockReservedEvent);
 
             String orderId = domainEvent.get("payload").get("orderId").asText();
 
@@ -63,8 +63,8 @@ public class StockReservedConsumer {
         } catch (AppException e) {
             throw new RuntimeException(e);
         } catch (Exception e) {
-            log.error("Error processing order created event for order:");
-            // TODO: Publish error event or handle retry logic
+            log.error("Error processing order created stockReservedEvent for order:");
+            // TODO: Publish error stockReservedEvent or handle retry logic
         }
     }
 }

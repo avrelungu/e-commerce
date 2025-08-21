@@ -1,13 +1,19 @@
 package com.example.inventory_service.service;
 
+import com.example.events.inventory.OutOfStockEvent;
 import com.example.inventory_service.dto.ReservationRequestDto;
+import com.example.inventory_service.dto.event.OutOfStockEventDto;
+import com.example.inventory_service.event.OutOfStock;
+import com.example.inventory_service.mapper.StockReservationMapper;
 import com.example.inventory_service.model.Inventory;
 import com.example.inventory_service.model.Product;
 import com.example.inventory_service.model.StockReservation;
+import com.example.inventory_service.publisher.EventPublisher;
 import com.example.inventory_service.repository.InventoryRepository;
 import com.example.inventory_service.repository.ProductRepository;
 import com.example.inventory_service.repository.StockReservationRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,18 +25,27 @@ import java.util.UUID;
 @Service
 @Slf4j
 public class StockReservationService {
-    
+    @Value("#{kafkaTopics.outOfStock}")
+    private String outOfStockTopic;
+
     private final StockReservationRepository stockReservationRepository;
     private final InventoryRepository inventoryRepository;
     private final ProductRepository productRepository;
+    private final StockReservationMapper stockReservationMapper;
+    private final EventPublisher eventPublisher;
     
     public StockReservationService(
             StockReservationRepository stockReservationRepository,
             InventoryRepository inventoryRepository,
-            ProductRepository productRepository) {
+            ProductRepository productRepository,
+            StockReservationMapper stockReservationMapper,
+            EventPublisher eventPublisher
+    ) {
         this.stockReservationRepository = stockReservationRepository;
         this.inventoryRepository = inventoryRepository;
         this.productRepository = productRepository;
+        this.stockReservationMapper = stockReservationMapper;
+        this.eventPublisher = eventPublisher;
     }
     
     @Transactional
@@ -42,6 +57,13 @@ public class StockReservationService {
                 if (!hasAvailableStock(request.getProductId(), request.getQuantity())) {
                     log.warn("Insufficient stock for product {} - requested: {}, available: {}",
                             request.getProductId(), request.getQuantity(), getAvailableStock(request.getProductId()));
+
+                    OutOfStockEvent outOfStockEvent = stockReservationMapper.toOutOfStockEvent(request, orderId, getAvailableStock(request.getProductId()));
+
+                    OutOfStockEventDto outOfStockEventDto = stockReservationMapper.toOutOfStockEventDto(outOfStockEvent);
+
+                    eventPublisher.publish(new OutOfStock(outOfStockTopic, outOfStockEventDto, String.valueOf(orderId)));
+
                     return List.of();
                 }
             }

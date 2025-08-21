@@ -1,6 +1,5 @@
 package com.example.inventory_service.consumer;
 
-import com.example.events.inventory.StockReservedEvent;
 import com.example.events.order.OrderCreatedEvent;
 import com.example.inventory_service.dto.ReservationRequestDto;
 import com.example.inventory_service.dto.event.StockReservedEventDto;
@@ -58,32 +57,25 @@ public class OrderCreatedEventConsumer {
             List<ReservationRequestDto> reservationRequests = orderCreatedEvent.getItems()
                     .stream()
                     .map(item -> new ReservationRequestDto(
-                            UUID.fromString(item.getProductId()), 
+                            UUID.fromString(item.getProductId()),
                             item.getQuantity()))
                     .toList();
 
             List<StockReservation> reservations = stockReservationService.reserveStock(
-                    UUID.fromString(orderCreatedEvent.getOrderId()), 
+                    UUID.fromString(orderCreatedEvent.getOrderId()),
                     reservationRequests
             );
 
             if (!reservations.isEmpty()) {
                 log.info("Stock reservation successful for order: {}", orderCreatedEvent.getOrderId());
-                StockReservedEvent stockReservedEvent = stockReservationMapper.toStockReservedEvent(reservations, eventId, orderId);
-                log.info("Stock reserved event: {}: ", stockReservedEvent);
+                com.example.events.inventory.StockReservedEvent stockReservedEvent = stockReservationMapper.toStockReservedEvent(reservations, orderId);
 
                 StockReservedEventDto stockReservedEventDto = stockReservationMapper.toStockReservedEventDto(stockReservedEvent);
 
                 eventPublisher.publish(new StockReserved(stockReservedTopic, stockReservedEventDto, orderId));
-                // TODO: Populate stockReservedEvent with reservation data and publish
-            } else {
-                log.warn("Stock reservation failed for order: {}", orderCreatedEvent.getOrderId());
-                // TODO: Publish OutOfStockEvent
             }
-            
         } catch (Exception e) {
             log.error("Error processing order created event for order: {}", orderCreatedEvent.getOrderId(), e);
-            // TODO: Publish error event or handle retry logic
         }
     }
 }

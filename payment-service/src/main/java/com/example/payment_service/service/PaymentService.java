@@ -7,6 +7,7 @@ import com.example.events.payment.PaymentProcessedEvent;
 import com.example.events.payment.PaymentRequestEvent;
 import com.example.payment_service.dto.event.PaymentFailedEventDto;
 import com.example.payment_service.dto.event.PaymentProcessedEventDto;
+import com.example.payment_service.event.PaymentRequestFailed;
 import com.example.payment_service.event.PaymentRequestProcessed;
 import com.example.payment_service.mapper.PaymentRequestMapper;
 import com.example.payment_service.model.Payment;
@@ -165,7 +166,7 @@ public class PaymentService {
 
         PaymentFailedEventDto paymentFailedEventDto = createFailureEvent(request, reason, payment.getRetryCount());
 
-        eventPublisher.publish(new PaymentRequestProcessed(paymentRequestFailedTopic, payment.getOrderId().toString(), paymentFailedEventDto));
+        eventPublisher.publish(new PaymentRequestFailed(paymentRequestFailedTopic, payment.getOrderId().toString(), paymentFailedEventDto));
     }
 
     private PaymentProcessedEventDto createSuccessEvent(
