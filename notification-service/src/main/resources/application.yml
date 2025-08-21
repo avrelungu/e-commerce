@@ -21,7 +21,7 @@ spring:
       acks: all
 
     consumer:
-      group-id: order-service-group
+      group-id: notification-service-group
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
@@ -38,6 +38,9 @@ kafka:
     payment-request: "payment-request"
     payment-processed: "payment-processed"
     payment-failed: "payment-failed"
+    order-shipped: "shipping-order-shipped"
+    order-delivered: "shipping-order-delivered"
+    shipment-tracking-update: "shipping-tracking-update"
 
 server:
   port: 8085
