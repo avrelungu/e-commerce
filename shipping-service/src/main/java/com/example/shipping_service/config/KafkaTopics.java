@@ -15,4 +15,7 @@ public class KafkaTopics {
     private String paymentRequest;
     private String paymentProcessed;
     private String paymentFailed;
+    private String orderShipped;
+    private String orderDelivered;
+    private String shipmentTrackingUpdate;
 }
