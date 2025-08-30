@@ -2,6 +2,7 @@ package com.example.order_service.mapper;
 
 import com.example.order_service.dto.AddressDto;
 import com.example.order_service.dto.CreateOrderDto;
+import com.example.order_service.dto.OrderDto;
 import com.example.order_service.model.Order;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,6 +10,8 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface OrderMapper {
+    OrderDto toOrderDto(Order order);
+
     Order createOrderDtoToOrder(CreateOrderDto orderDto);
 
     default JsonNode mapAddressDtoToJsonNode(AddressDto addressDto) {

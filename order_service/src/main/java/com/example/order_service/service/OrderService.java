@@ -1,6 +1,7 @@
 package com.example.order_service.service;
 
 import com.example.order_service.dto.CreateOrderDto;
+import com.example.order_service.dto.OrderDto;
 import com.example.order_service.dto.OrderItemDto;
 import com.example.order_service.dto.event.OrderCreatedEventDto;
 import com.example.order_service.event.OrderCreated;
@@ -14,6 +15,9 @@ import com.example.order_service.publisher.EventPublisher;
 import com.example.order_service.repository.OrderRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.example.events.order.OrderCreatedEvent;
 
@@ -91,5 +95,16 @@ public class OrderService {
         return orderItemDtoList.stream()
                 .map(dto -> orderItemMapper.toOrderItem(dto, order))
                 .toList();
+    }
+
+    public Page<OrderDto> getOrders(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        return orderRepository.findAll(pageable)
+                .map(orderMapper::toOrderDto);
+    }
+
+    public List<OrderItemDto> getItemsOfOrder(String orderId) {
+
     }
 }
