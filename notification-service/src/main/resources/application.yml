@@ -1,6 +1,11 @@
 spring:
   application:
     name: notification-service
+
+  docker:
+    compose:
+      enabled: false
+
   sql:
     init:
       mode: never

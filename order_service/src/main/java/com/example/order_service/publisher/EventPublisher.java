@@ -4,6 +4,7 @@ import com.example.order_service.event.DomainEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -21,11 +22,10 @@ public class EventPublisher {
         this.objectMapper = objectMapper;
     }
 
+    @Retryable
     public void publish(DomainEvent event) {
         try {
             String domainEvent = objectMapper.writeValueAsString(event);
-
-            log.info("Publishing event: {}, {}, {}", event.getEventType(), domainEvent, event.getTopic());
 
             kafkaTemplate.send(event.getTopic(), event.getPartitionKey() , domainEvent)
                     .whenComplete((result, exception) -> {

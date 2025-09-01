@@ -2,6 +2,10 @@ spring:
   application:
     name: payment-service
 
+  docker:
+    compose:
+      enabled: false
+
   sql:
     init:
       mode: never

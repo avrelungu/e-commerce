@@ -2,6 +2,10 @@ spring:
   application:
     name: order-service
 
+  docker:
+    compose:
+      enabled: false
+
   sql:
     init:
       mode: never

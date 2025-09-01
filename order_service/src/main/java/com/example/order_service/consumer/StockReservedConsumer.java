@@ -41,8 +41,6 @@ public class StockReservedConsumer {
     @KafkaListener(topics = "#{kafkaTopics.stockReserved}", groupId = "order-service-inventory-processor")
     public void stockReservedConsumer(String stockReservedEvent) throws JsonProcessingException {
         try {
-            log.info("Stock reserved stockReservedEvent: {}", stockReservedEvent);
-
             JsonNode domainEvent = objectMapper.readTree(stockReservedEvent);
 
             String orderId = domainEvent.get("payload").get("orderId").asText();

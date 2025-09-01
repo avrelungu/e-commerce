@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  postgres-order:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: order_service
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: secret
+      
+  postgres-inventory:
+    image: postgres:15-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: inventory_service
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: secret

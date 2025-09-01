@@ -64,15 +64,11 @@ public class OrderService {
     public void createOrder(CreateOrderDto orderDto) throws AppException {
         Order order = buildOrder(orderDto);
 
-        log.info("Order: {}", order);
-        log.info("Order ITEMS: {}", order.getOrderItems());
-
         orderRepository.save(order);
 
         OrderCreatedEvent orderCreatedEvent = orderEventMapper.toOrderCreatedEvent(order);
-        OrderCreatedEventDto orderCreatedEventDto = orderEventMapper.toDto(orderCreatedEvent);
 
-        log.info("Order created event DTO: {}", orderCreatedEventDto);
+        OrderCreatedEventDto orderCreatedEventDto = orderEventMapper.toDto(orderCreatedEvent);
 
         eventPublisher.publish(new OrderCreated(orderCreatedTopic, orderCreatedEventDto, order.getId().toString()));
     }

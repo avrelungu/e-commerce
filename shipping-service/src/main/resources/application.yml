@@ -2,6 +2,10 @@ spring:
   application:
     name: shipping-service
 
+  docker:
+    compose:
+      enabled: false
+
   sql:
     init:
       mode: never
