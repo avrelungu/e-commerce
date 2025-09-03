@@ -99,8 +99,4 @@ public class OrderService {
         return orderRepository.findAll(pageable)
                 .map(orderMapper::toOrderDto);
     }
-
-    public List<OrderItemDto> getItemsOfOrder(String orderId) {
-
-    }
 }

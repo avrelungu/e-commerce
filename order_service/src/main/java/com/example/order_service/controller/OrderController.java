@@ -6,8 +6,8 @@ import com.example.order_service.dto.OrderItemDto;
 import com.example.order_service.exceptions.AppException;
 import com.example.order_service.service.OrderItemService;
 import com.example.order_service.service.OrderService;
+import com.example.shared_common.idempotency.ApiIdempotencyService;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,15 +19,45 @@ public class OrderController {
 
     private final OrderService orderService;
     private final OrderItemService orderItemService;
+    private final ApiIdempotencyService apiIdempotencyService;
 
-    public OrderController(OrderService orderService, OrderItemService orderItemService) {
+    public OrderController(
+            OrderService orderService,
+            OrderItemService orderItemService,
+            ApiIdempotencyService apiIdempotencyService
+    ) {
         this.orderService = orderService;
         this.orderItemService = orderItemService;
+        this.apiIdempotencyService = apiIdempotencyService;
     }
 
     @PostMapping
-    public ResponseEntity<Void> createOrder(@RequestBody CreateOrderDto orderDto) throws AppException {
+    public ResponseEntity<Void> createOrder(
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey,
+            @RequestBody CreateOrderDto orderDto
+    ) throws AppException {
+        if (idempotencyKey != null) {
+            var existingResponse = apiIdempotencyService.checkAndRetrieve(
+                idempotencyKey, 
+                "order-create", 
+                Void.class
+            );
+            
+            if (existingResponse.isPresent()) {
+                return ResponseEntity.status(existingResponse.get().getStatusCode()).build();
+            }
+        }
+
         orderService.createOrder(orderDto);
+
+        if (idempotencyKey != null) {
+            apiIdempotencyService.storeResponse(
+                idempotencyKey,
+                "order-create", 
+                null,
+                org.springframework.http.HttpStatus.OK
+            );
+        }
 
         return ResponseEntity.ok().build();
     }
