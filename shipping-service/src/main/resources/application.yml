@@ -33,6 +33,12 @@ spring:
       properties:
         spring.json.trusted.packages: "*"
 
+  data:
+    redis:
+      port: 6379
+      host: localhost
+      timeout: 2000ms
+
 kafka:
   topics:
     order-created: "order-created"
