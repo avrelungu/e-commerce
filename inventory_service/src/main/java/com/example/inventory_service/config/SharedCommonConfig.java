@@ -1,4 +1,4 @@
-package com.example.order_service.config;
+package com.example.inventory_service.config;
 
 import com.example.shared_common.idempotency.ApiIdempotencyService;
 import com.example.shared_common.idempotency.EventIdempotencyService;

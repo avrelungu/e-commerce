@@ -61,7 +61,7 @@ public class OrderService {
         this.orderEventMapper = orderEventMapper;
     }
 
-    public void createOrder(CreateOrderDto orderDto) throws AppException {
+    public Order createOrder(CreateOrderDto orderDto) throws AppException {
         Order order = buildOrder(orderDto);
 
         orderRepository.save(order);
@@ -71,6 +71,8 @@ public class OrderService {
         OrderCreatedEventDto orderCreatedEventDto = orderEventMapper.toDto(orderCreatedEvent);
 
         eventPublisher.publish(new OrderCreated(orderCreatedTopic, orderCreatedEventDto, order.getId().toString()));
+
+        return order;
     }
 
     private Order buildOrder(CreateOrderDto orderDto) {
