@@ -54,3 +54,22 @@ kafka:
 
 server:
   port: 8082
+
+# Resilience4j Configuration
+resilience4j:
+  retry:
+    instances:
+      inventory-stock-reservation:
+        max-attempts: 3
+        wait-duration:
+          seconds: 1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+  endpoint:
+    health:
+      show-details: always

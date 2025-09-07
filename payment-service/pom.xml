@@ -6,7 +6,7 @@
 		<groupId>com.example</groupId>
 		<artifactId>e-commerce</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
-		<relativePath>../shared/pom.xml</relativePath>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>payment_service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>

@@ -22,7 +22,6 @@ public class EventPublisher {
         this.objectMapper = objectMapper;
     }
 
-    @Retryable
     public void publish(DomainEvent event) {
         try {
             String domainEvent = objectMapper.writeValueAsString(event);

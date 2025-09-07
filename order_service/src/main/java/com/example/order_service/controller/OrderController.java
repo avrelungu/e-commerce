@@ -4,10 +4,13 @@ import com.example.order_service.dto.CreateOrderDto;
 import com.example.order_service.dto.OrderDto;
 import com.example.order_service.dto.OrderItemDto;
 import com.example.order_service.exceptions.AppException;
+import com.example.order_service.mapper.OrderMapper;
+import com.example.order_service.model.Order;
 import com.example.order_service.service.OrderItemService;
 import com.example.order_service.service.OrderService;
 import com.example.shared_common.idempotency.ApiIdempotencyService;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,21 +23,23 @@ public class OrderController {
     private final OrderService orderService;
     private final OrderItemService orderItemService;
     private final ApiIdempotencyService apiIdempotencyService;
+    private final OrderMapper orderMapper;
 
     public OrderController(
             OrderService orderService,
             OrderItemService orderItemService,
-            ApiIdempotencyService apiIdempotencyService
-    ) {
+            ApiIdempotencyService apiIdempotencyService,
+            OrderMapper orderMapper) {
         this.orderService = orderService;
         this.orderItemService = orderItemService;
         this.apiIdempotencyService = apiIdempotencyService;
+        this.orderMapper = orderMapper;
     }
 
     @PostMapping
-    public ResponseEntity<Void> createOrder(
+    public ResponseEntity<OrderDto> createOrder(
             @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey,
-            @RequestBody CreateOrderDto orderDto
+            @RequestBody CreateOrderDto createOrderDto
     ) throws AppException {
         if (idempotencyKey != null) {
             var existingResponse = apiIdempotencyService.checkAndRetrieve(
@@ -48,7 +53,7 @@ public class OrderController {
             }
         }
 
-        orderService.createOrder(orderDto);
+        Order order = orderService.createOrder(createOrderDto);
 
         if (idempotencyKey != null) {
             apiIdempotencyService.storeResponse(
@@ -57,9 +62,13 @@ public class OrderController {
                 null,
                 org.springframework.http.HttpStatus.OK
             );
+
+            OrderDto orderDto = orderMapper.toOrderDto(order);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(orderDto);
         }
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping

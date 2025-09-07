@@ -4,9 +4,9 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-@ConfigurationProperties(prefix = "kafka.topics")
-@Component
 @Data
+@Component
+@ConfigurationProperties(prefix = "kafka.topics")
 public class KafkaTopics {
     private String orderCreated;
     private String stockReserved;

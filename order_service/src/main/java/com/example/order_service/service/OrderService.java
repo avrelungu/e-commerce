@@ -32,9 +32,6 @@ public class OrderService {
     @Value("#{kafkaTopics.orderCreated}")
     private String orderCreatedTopic;
 
-    @Value("${inventory_service.products.tax-rate}")
-    private BigDecimal SALES_TAX_RATE;
-
     private final EventPublisher eventPublisher;
 
     private final OrderNumberGenerator orderNumberGenerator;

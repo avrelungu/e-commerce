@@ -12,9 +12,11 @@ import com.example.inventory_service.publisher.EventPublisher;
 import com.example.inventory_service.repository.InventoryRepository;
 import com.example.inventory_service.repository.ProductRepository;
 import com.example.inventory_service.repository.StockReservationRepository;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -47,8 +49,9 @@ public class StockReservationService {
         this.stockReservationMapper = stockReservationMapper;
         this.eventPublisher = eventPublisher;
     }
-    
-    @Transactional
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Retry(name = "inventory-stock-reservation")
     public List<StockReservation> reserveStock(UUID orderId, List<ReservationRequestDto> reservationRequests) {
         log.info("Attempting to reserve stock for order: {}", orderId);
         
@@ -85,7 +88,7 @@ public class StockReservationService {
     }
     
     private boolean hasAvailableStock(UUID productId, int requestedQuantity) {
-        Inventory inventory = inventoryRepository.findByProductId(productId)
+        Inventory inventory = inventoryRepository.findByProductIdWithLock(productId)
                 .orElse(null);
         
         if (inventory == null) {
@@ -100,7 +103,7 @@ public class StockReservationService {
     }
     
     private int getAvailableStock(UUID productId) {
-        Inventory inventory = inventoryRepository.findByProductId(productId)
+        Inventory inventory = inventoryRepository.findByProductIdWithLock(productId)
                 .orElse(null);
         
         if (inventory == null) {
@@ -131,7 +134,7 @@ public class StockReservationService {
     }
     
     private void updateInventoryReservedQuantity(UUID productId, int quantity) {
-        Inventory inventory = inventoryRepository.findByProductId(productId)
+        Inventory inventory = inventoryRepository.findByProductIdWithLock(productId)
                 .orElseThrow(() -> new RuntimeException("Inventory not found for product: " + productId));
         
         inventory.setReservedQuantity(inventory.getReservedQuantity() + quantity);
@@ -148,7 +151,7 @@ public class StockReservationService {
                 reservation.setStatus("CONFIRMED");
                 stockReservationRepository.save(reservation);
                 
-                Inventory inventory = inventoryRepository.findByProductId(reservation.getProduct().getId())
+                Inventory inventory = inventoryRepository.findByProductIdWithLock(reservation.getProduct().getId())
                         .orElseThrow(() -> new RuntimeException("Inventory not found"));
                 
                 inventory.setAvailableQuantity(inventory.getAvailableQuantity() - reservation.getQuantity());
@@ -171,7 +174,7 @@ public class StockReservationService {
                 reservation.setStatus("RELEASED");
                 stockReservationRepository.save(reservation);
                 
-                Inventory inventory = inventoryRepository.findByProductId(reservation.getProduct().getId())
+                Inventory inventory = inventoryRepository.findByProductIdWithLock(reservation.getProduct().getId())
                         .orElseThrow(() -> new RuntimeException("Inventory not found"));
                 
                 inventory.setReservedQuantity(inventory.getReservedQuantity() - reservation.getQuantity());

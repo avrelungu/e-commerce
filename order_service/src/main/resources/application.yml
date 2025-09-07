@@ -29,6 +29,9 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       acks: all
+      retries: 3
+      properties:
+        retry.backoff.ms: 1000
 
     consumer:
       group-id: order-service-group
@@ -55,7 +58,24 @@ kafka:
     shipment-tracking-update: "shipping-tracking-update"
 
 inventory_service:
-  api:
-    url: http://localhost:8082/api/inventory
   products:
     tax-rate: 0.21
+
+# Resilience4j Configuration
+resilience4j:
+  retry:
+    instances:
+      order-save:
+        max-attempts: 3
+        wait-duration:
+          seconds: 1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+  endpoint:
+    health:
+      show-details: always
