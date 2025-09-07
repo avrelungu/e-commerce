@@ -73,6 +73,34 @@
   {
     "namespace": "com.example.events.order",
     "type": "record",
+    "name": "OrderPaymentEvent",
+    "doc": "Event published when an order needs payment processing",
+    "fields": [
+      {
+        "name": "orderId",
+        "type": "string"
+      },
+      {
+        "name": "customerId",
+        "type": "string"
+      },
+      {
+        "name": "totalAmount",
+        "type": "com.example.events.common.Money"
+      },
+      {
+        "name": "paymentMethodToken",
+        "type": "string"
+      },
+      {
+        "name": "paymentMethodType",
+        "type": "string"
+      }
+    ]
+  },
+  {
+    "namespace": "com.example.events.order",
+    "type": "record",
     "name": "OrderCancelledEvent",
     "fields": [
       {

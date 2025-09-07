@@ -1,11 +1,11 @@
 package com.example.order_service.event;
 
-import com.example.order_service.dto.event.PaymentRequestEventDto;
+import com.example.events.payment.PaymentRequestEvent;
 
 public class PaymentRequest extends DomainEvent {
     private final String paymentRequestTopic;
 
-    public PaymentRequest(String paymentRequestEventTopic, String orderId, PaymentRequestEventDto paymentRequestEventDto) {
+    public PaymentRequest(String paymentRequestEventTopic, String orderId, PaymentRequestEvent paymentRequestEventDto) {
         super(paymentRequestEventDto, orderId);
 
         paymentRequestTopic = paymentRequestEventTopic;

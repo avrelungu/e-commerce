@@ -27,19 +27,21 @@ spring:
     
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
       acks: all
       retries: 3
       properties:
         retry.backoff.ms: 1000
+        schema.registry.url: http://localhost:8090
 
     consumer:
       group-id: order-service-group
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
       properties:
-        spring.json.trusted.packages: "*"
+        schema.registry.url: http://localhost:8090
+        specific.avro.reader: true
 
 server:
   port: 8081

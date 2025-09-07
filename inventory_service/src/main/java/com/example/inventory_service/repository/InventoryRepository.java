@@ -12,10 +12,8 @@ import java.util.UUID;
 
 @Repository
 public interface InventoryRepository extends JpaRepository<Inventory, Integer> {
-    Optional<Inventory> findByProductId(UUID productId);
-
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    Optional<Inventory> findByProductIdWithLock(UUID productId);
+    Optional<Inventory> findByProductId(UUID productId);
 
     List<Inventory> findAllByProductIdIn(List<UUID> productIds);
 }

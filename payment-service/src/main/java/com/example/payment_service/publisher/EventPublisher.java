@@ -14,11 +14,11 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class EventPublisher {
-    private final KafkaTemplate<Object, String> kafkaTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
     public EventPublisher(
-            KafkaTemplate<Object, String> kafkaTemplate,
+            KafkaTemplate<String, Object> kafkaTemplate,
             ObjectMapper objectMapper,
             PaymentRequestMapper paymentRequestMapper) {
         this.kafkaTemplate = kafkaTemplate;
@@ -27,11 +27,9 @@ public class EventPublisher {
 
     public void publish(DomainEvent event) {
         try {
-            String domainEvent = objectMapper.writeValueAsString(event);
+            log.info("Publishing event: {}, {}", event, event.getTopic());
 
-            log.info("Publishing event: {}, {}", domainEvent, event.getTopic());
-
-            kafkaTemplate.send(event.getTopic(), event.getAggregateId() , domainEvent)
+            kafkaTemplate.send(event.getTopic(), event.getPartitionKey() ,event.getPayload())
                     .whenComplete((result, exception) -> {
                         if (exception != null) {
                             log.error("Error publishing event", exception);

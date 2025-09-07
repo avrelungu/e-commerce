@@ -26,16 +26,21 @@ spring:
     
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
       acks: all
+      retries: 3
+      properties:
+        retry.backoff.ms: 1000
+        schema.registry.url: http://localhost:8090
 
     consumer:
       group-id: inventory-service-group
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
       properties:
-        spring.json.trusted.packages: "*"
+        schema.registry.url: http://localhost:8090
+        specific.avro.reader: true
 
   data:
     redis:
@@ -51,6 +56,7 @@ kafka:
     out-of-stock: "inventory-out-of-stock"
     payment-processed: "payment-processed"
     payment-failed: "payment-failed"
+    stock-confirmation-failed: "stock-confirmation-failed"
 
 server:
   port: 8082
@@ -63,6 +69,20 @@ resilience4j:
         max-attempts: 3
         wait-duration:
           seconds: 1
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: 2
+        retry-exceptions:
+          - org.springframework.dao.CannotAcquireLockException
+          - org.springframework.dao.DeadlockLoserDataAccessException
+          - org.springframework.dao.OptimisticLockingFailureException
+          - org.hibernate.StaleStateException
+          - org.springframework.orm.ObjectOptimisticLockingFailureException
+          - org.springframework.dao.DataAccessResourceFailureException
+          - org.springframework.dao.TransientDataAccessResourceException
+        ignore-exceptions:
+          - com.example.inventory_service.exception.InsufficientStockException
+          - java.lang.IllegalArgumentException
+          - java.lang.IllegalStateException
 
 management:
   endpoints:

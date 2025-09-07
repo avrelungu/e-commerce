@@ -65,9 +65,7 @@ public class OrderService {
 
         OrderCreatedEvent orderCreatedEvent = orderEventMapper.toOrderCreatedEvent(order);
 
-        OrderCreatedEventDto orderCreatedEventDto = orderEventMapper.toDto(orderCreatedEvent);
-
-        eventPublisher.publish(new OrderCreated(orderCreatedTopic, orderCreatedEventDto, order.getId().toString()));
+        eventPublisher.publish(new OrderCreated(orderCreatedTopic, orderCreatedEvent, order.getId().toString()));
 
         return order;
     }

@@ -1,6 +1,6 @@
 package com.example.order_service.publisher;
 
-import com.example.order_service.dto.event.OrderCreatedEventDto;
+import com.example.events.order.OrderCreatedEvent;
 import com.example.order_service.event.DomainEvent;
 import com.example.order_service.event.OrderCreated;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ public class EventPublisherRetryTest {
 
     @Test
     void shouldPublishEvent() throws Exception {
-        DomainEvent event = new OrderCreated("123", new OrderCreatedEventDto(), "123");
+        DomainEvent event = new OrderCreated("123", new OrderCreatedEvent(), "123");
 
         eventPublisher.publish(event);
 

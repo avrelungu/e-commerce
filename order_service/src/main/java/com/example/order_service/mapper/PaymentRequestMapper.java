@@ -1,8 +1,8 @@
 package com.example.order_service.mapper;
 
 import com.example.events.common.Money;
+import com.example.events.payment.PaymentRequestEvent;
 import com.example.order_service.dto.event.MoneyDto;
-import com.example.order_service.dto.event.PaymentRequestEventDto;
 import com.example.order_service.model.Order;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -14,7 +14,7 @@ import java.math.RoundingMode;
 public interface PaymentRequestMapper {
     @Mapping(target = "orderId", source = "id")
     @Mapping(target = "amount", source = "totalAmount")
-    PaymentRequestEventDto toPaymentRequestEvent(Order order);
+    PaymentRequestEvent toPaymentRequestEvent(Order order);
 
     default Money map(BigDecimal value) {
         return Money.newBuilder()

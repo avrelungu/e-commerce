@@ -4,16 +4,14 @@ import com.example.events.order.OrderCreatedEvent;
 import com.example.inventory_service.dto.ReservationRequestDto;
 import com.example.inventory_service.dto.event.StockReservedEventDto;
 import com.example.inventory_service.event.StockReserved;
+import com.example.inventory_service.exception.InsufficientStockException;
 import com.example.inventory_service.mapper.StockReservationMapper;
 import com.example.inventory_service.model.StockReservation;
 import com.example.inventory_service.publisher.EventPublisher;
 import com.example.inventory_service.service.StockReservationService;
-import com.example.shared_common.idempotency.ApiIdempotencyService;
 import com.example.shared_common.idempotency.EventIdempotencyService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -30,34 +28,29 @@ public class OrderCreatedEventConsumer {
     private final StockReservationService stockReservationService;
     private final StockReservationMapper stockReservationMapper;
     private final EventPublisher eventPublisher;
-    private final ObjectMapper objectMapper;
     private final EventIdempotencyService eventIdempotencyService;
 
     public OrderCreatedEventConsumer(
             StockReservationService stockReservationService,
             StockReservationMapper stockReservationMapper,
             EventPublisher eventPublisher,
-            ObjectMapper objectMapper,
             EventIdempotencyService eventIdempotencyService
     ) {
         this.stockReservationService = stockReservationService;
         this.stockReservationMapper = stockReservationMapper;
         this.eventPublisher = eventPublisher;
-        this.objectMapper = objectMapper;
         this.eventIdempotencyService = eventIdempotencyService;
     }
 
     @KafkaListener(topics = "#{kafkaTopics.orderCreated}")
-    public void orderCreateListener(String event) throws JsonProcessingException {
-        JsonNode domainEvent = objectMapper.readTree(event);
-        JsonNode payload = domainEvent.get("payload");
-        String eventId = domainEvent.get("eventId").asText();
+    public void orderCreateListener(ConsumerRecord<String, OrderCreatedEvent> record) {
+        OrderCreatedEvent orderCreatedEvent = record.value();
+        String eventId = orderCreatedEvent.getOrderId();
 
         log.info("Received orderCreated eventId {}", eventId);
 
         boolean processed = eventIdempotencyService.processOnce(eventId, () -> {
             try {
-                OrderCreatedEvent orderCreatedEvent = objectMapper.treeToValue(payload, OrderCreatedEvent.class);
 
                 String orderId = orderCreatedEvent.getOrderId();
 
@@ -83,9 +76,9 @@ public class OrderCreatedEventConsumer {
 
                     eventPublisher.publish(new StockReserved(stockReservedTopic, stockReservedEventDto, orderId));
                 }
-            } catch (Exception e) {
+            } catch (Exception | InsufficientStockException e) {
                 log.error("Error processing order created event", e);
-                throw new RuntimeException(e);
+                // TODO cancel order with insufficient stock
             }
         });
 

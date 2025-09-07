@@ -1,10 +1,14 @@
 package com.example.inventory_service.consumer;
 
+import com.example.inventory_service.event.StockConfirmationFailed;
+import com.example.inventory_service.exception.InsufficientStockException;
+import com.example.inventory_service.publisher.EventPublisher;
 import com.example.inventory_service.service.StockReservationService;
 import com.example.shared_common.idempotency.EventIdempotencyService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -14,14 +18,19 @@ import java.util.UUID;
 @Slf4j
 public class PaymentProcessedEventConsumer {
 
+    @Value("${kafka.topics.stock-confirmation-failed}")
+    private String stockConfirmationFailedTopic;
+
     private final ObjectMapper objectMapper;
     private final StockReservationService stockReservationService;
     private final EventIdempotencyService eventIdempotencyService;
+    private final EventPublisher eventPublisher;
 
-    public PaymentProcessedEventConsumer(ObjectMapper objectMapper, StockReservationService stockReservationService, EventIdempotencyService eventIdempotencyService) {
+    public PaymentProcessedEventConsumer(ObjectMapper objectMapper, StockReservationService stockReservationService, EventIdempotencyService eventIdempotencyService, EventPublisher eventPublisher) {
         this.objectMapper = objectMapper;
         this.stockReservationService = stockReservationService;
         this.eventIdempotencyService = eventIdempotencyService;
+        this.eventPublisher = eventPublisher;
     }
 
     @KafkaListener(topics = "#{kafkaTopics.paymentProcessed}")
@@ -34,7 +43,13 @@ public class PaymentProcessedEventConsumer {
             String orderId = domaineEventPayload.get("orderId").asText();
 
             boolean processed = eventIdempotencyService.processOnce(eventId, () -> {
-                stockReservationService.confirmReservation(UUID.fromString(orderId));
+                try {
+                    stockReservationService.confirmReservation(UUID.fromString(orderId));
+                } catch (InsufficientStockException e) {
+                    log.error("Reservation confirmations failed: {}", e.getMessage());
+
+                    eventPublisher.publish(new StockConfirmationFailed(stockConfirmationFailedTopic, paymentProcessedEvent, orderId));
+                }
             });
 
             if (!processed) {

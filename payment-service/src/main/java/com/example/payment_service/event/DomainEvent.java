@@ -24,4 +24,6 @@ public abstract class DomainEvent {
     public abstract String getEventType();
 
     public abstract String getTopic();
+
+    public String getPartitionKey() { return this.aggregateId; }
 }

@@ -103,5 +103,93 @@
         "type": "boolean"
       }
     ]
+  },
+  {
+    "namespace": "com.example.events.payment",
+    "type": "record",
+    "name": "RefundProcessedEvent",
+    "fields": [
+      {
+        "name": "refundId",
+        "type": "string"
+      },
+      {
+        "name": "paymentId",
+        "type": "string"
+      },
+      {
+        "name": "orderId",
+        "type": "string"
+      },
+      {
+        "name": "refundAmount",
+        "type": "com.example.events.common.Money"
+      },
+      {
+        "name": "refundType",
+        "type": {
+          "type": "enum",
+          "name": "RefundType",
+          "symbols": ["FULL", "PARTIAL", "AUTOMATIC_CANCELLATION"]
+        }
+      },
+      {
+        "name": "reason",
+        "type": ["null", "string"],
+        "default": null
+      },
+      {
+        "name": "refundTransactionId",
+        "type": "string"
+      },
+      {
+        "name": "processedAt",
+        "type": "string"
+      }
+    ]
+  },
+  {
+    "namespace": "com.example.events.payment",
+    "type": "record",
+    "name": "RefundFailedEvent",
+    "fields": [
+      {
+        "name": "refundId",
+        "type": "string"
+      },
+      {
+        "name": "paymentId",
+        "type": "string"
+      },
+      {
+        "name": "orderId",
+        "type": "string"
+      },
+      {
+        "name": "refundAmount",
+        "type": "com.example.events.common.Money"
+      },
+      {
+        "name": "refundType",
+        "type": "RefundType"
+      },
+      {
+        "name": "reason",
+        "type": ["null", "string"],
+        "default": null
+      },
+      {
+        "name": "failureReason",
+        "type": "string"
+      },
+      {
+        "name": "attemptNumber",
+        "type": "int"
+      },
+      {
+        "name": "maxAttempts",
+        "type": "int"
+      }
+    ]
   }
 ]

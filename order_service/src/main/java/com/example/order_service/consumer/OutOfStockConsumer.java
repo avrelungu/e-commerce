@@ -1,10 +1,9 @@
 package com.example.order_service.consumer;
 
+import com.example.events.inventory.OutOfStockEvent;
 import com.example.order_service.enums.OrderStatus;
 import com.example.order_service.model.Order;
 import com.example.order_service.repository.OrderRepository;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -16,20 +15,16 @@ import java.util.UUID;
 @Slf4j
 public class OutOfStockConsumer {
 
-    private final ObjectMapper objectMapper;
     private final OrderRepository orderRepository;
 
-    public OutOfStockConsumer(ObjectMapper objectMapper, OrderRepository orderRepository) {
-        this.objectMapper = objectMapper;
+    public OutOfStockConsumer(OrderRepository orderRepository) {
         this.orderRepository = orderRepository;
     }
 
     @KafkaListener(topics = "#{kafkaTopics.outOfStock}")
-    private void outOfStockConsumer(String outOfStockEvent) {
+    private void outOfStockConsumer(OutOfStockEvent outOfStockEvent) {
         try {
-            JsonNode domainEventPayload = objectMapper.readTree(outOfStockEvent).get("payload");
-
-            String orderId = domainEventPayload.get("orderId").asText();
+            String orderId = outOfStockEvent.getOrderId();
 
             Optional<Order> order = orderRepository.findById(UUID.fromString(orderId));
 

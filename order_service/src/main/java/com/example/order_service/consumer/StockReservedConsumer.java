@@ -1,6 +1,7 @@
 package com.example.order_service.consumer;
 
-import com.example.order_service.dto.event.PaymentRequestEventDto;
+import com.example.events.inventory.StockReservedEvent;
+import com.example.events.payment.PaymentRequestEvent;
 import com.example.order_service.enums.OrderStatus;
 import com.example.order_service.event.PaymentRequest;
 import com.example.order_service.exceptions.AppException;
@@ -8,9 +9,6 @@ import com.example.order_service.mapper.PaymentRequestMapper;
 import com.example.order_service.model.Order;
 import com.example.order_service.publisher.EventPublisher;
 import com.example.order_service.repository.OrderRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -28,22 +26,22 @@ public class StockReservedConsumer {
     @Value("#{kafkaTopics.paymentRequest}")
     private String paymentRequestTopic;
 
-    private final ObjectMapper objectMapper;
     private final OrderRepository orderRepository;
 
-    public StockReservedConsumer(ObjectMapper objectMapper, OrderRepository orderRepository, EventPublisher eventPublisher, PaymentRequestMapper paymentRequestMapper) {
-        this.objectMapper = objectMapper;
+    public StockReservedConsumer(
+            OrderRepository orderRepository,
+            EventPublisher eventPublisher,
+            PaymentRequestMapper paymentRequestMapper
+    ) {
         this.orderRepository = orderRepository;
         this.eventPublisher = eventPublisher;
         this.paymentRequestMapper = paymentRequestMapper;
     }
 
     @KafkaListener(topics = "#{kafkaTopics.stockReserved}", groupId = "order-service-inventory-processor")
-    public void stockReservedConsumer(String stockReservedEvent) throws JsonProcessingException {
+    public void stockReservedConsumer(StockReservedEvent stockReservedEvent) {
         try {
-            JsonNode domainEvent = objectMapper.readTree(stockReservedEvent);
-
-            String orderId = domainEvent.get("payload").get("orderId").asText();
+            String orderId = stockReservedEvent.getOrderId();
 
             Optional<Order> order = orderRepository.findById(UUID.fromString(orderId));
 
@@ -55,14 +53,14 @@ public class StockReservedConsumer {
 
             orderRepository.save(order.get());
 
-            PaymentRequestEventDto paymentRequestEventDto = paymentRequestMapper.toPaymentRequestEvent(order.get());
+            PaymentRequestEvent paymentRequestEvent = paymentRequestMapper.toPaymentRequestEvent(order.get());
 
-            eventPublisher.publish(new PaymentRequest(paymentRequestTopic, orderId, paymentRequestEventDto));
+            eventPublisher.publish(new PaymentRequest(paymentRequestTopic, orderId, paymentRequestEvent));
         } catch (AppException e) {
             throw new RuntimeException(e);
         } catch (Exception e) {
             log.error("Error processing order created stockReservedEvent for order:");
-            // TODO: Publish error stockReservedEvent or handle retry logic
+            throw e;
         }
     }
 }

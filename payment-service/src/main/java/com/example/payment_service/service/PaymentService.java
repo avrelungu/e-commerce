@@ -13,6 +13,8 @@ import com.example.payment_service.mapper.PaymentRequestMapper;
 import com.example.payment_service.model.Payment;
 import com.example.payment_service.publisher.EventPublisher;
 import com.example.payment_service.repository.PaymentRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -64,6 +66,8 @@ public class PaymentService {
     );
 
     @Transactional
+    @Retry(name = "payment-processing")
+    @CircuitBreaker(name = "payment-processing")
     public void processPayment(
             PaymentRequestEvent request
     ) {
