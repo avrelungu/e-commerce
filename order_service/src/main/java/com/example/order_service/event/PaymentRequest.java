@@ -5,7 +5,7 @@ import com.example.events.payment.PaymentRequestEvent;
 public class PaymentRequest extends DomainEvent {
     private final String paymentRequestTopic;
 
-    public PaymentRequest(String paymentRequestEventTopic, String orderId, PaymentRequestEvent paymentRequestEventDto) {
+    public PaymentRequest(String paymentRequestEventTopic, PaymentRequestEvent paymentRequestEventDto, String orderId) {
         super(paymentRequestEventDto, orderId);
 
         paymentRequestTopic = paymentRequestEventTopic;

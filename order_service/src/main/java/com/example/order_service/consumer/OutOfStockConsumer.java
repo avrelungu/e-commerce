@@ -35,6 +35,7 @@ public class OutOfStockConsumer {
             }
 
             order.get().setStatus(OrderStatus.OUT_OF_STOCK.name());
+
             orderRepository.save(order.get());
         } catch (Exception e) {
             log.error("Error while processing outOfStockEvent: {}", outOfStockEvent, e);

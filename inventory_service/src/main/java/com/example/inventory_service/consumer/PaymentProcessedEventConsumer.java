@@ -1,11 +1,11 @@
 package com.example.inventory_service.consumer;
 
+import com.example.events.payment.PaymentProcessedEvent;
 import com.example.inventory_service.event.StockConfirmationFailed;
 import com.example.inventory_service.exception.InsufficientStockException;
 import com.example.inventory_service.publisher.EventPublisher;
 import com.example.inventory_service.service.StockReservationService;
 import com.example.shared_common.idempotency.EventIdempotencyService;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,28 +21,26 @@ public class PaymentProcessedEventConsumer {
     @Value("${kafka.topics.stock-confirmation-failed}")
     private String stockConfirmationFailedTopic;
 
-    private final ObjectMapper objectMapper;
     private final StockReservationService stockReservationService;
     private final EventIdempotencyService eventIdempotencyService;
     private final EventPublisher eventPublisher;
 
-    public PaymentProcessedEventConsumer(ObjectMapper objectMapper, StockReservationService stockReservationService, EventIdempotencyService eventIdempotencyService, EventPublisher eventPublisher) {
-        this.objectMapper = objectMapper;
+    public PaymentProcessedEventConsumer(
+            StockReservationService stockReservationService,
+            EventIdempotencyService eventIdempotencyService,
+            EventPublisher eventPublisher
+    ) {
         this.stockReservationService = stockReservationService;
         this.eventIdempotencyService = eventIdempotencyService;
         this.eventPublisher = eventPublisher;
     }
 
     @KafkaListener(topics = "#{kafkaTopics.paymentProcessed}")
-    public void paymentProcessedEventConsumer(String paymentProcessedEvent) {
+    public void paymentProcessedEventConsumer(PaymentProcessedEvent paymentProcessedEvent) {
         try {
-            JsonNode domainEvent = objectMapper.readTree(paymentProcessedEvent);
-            String eventId = domainEvent.get("eventId").asText();
-            JsonNode domaineEventPayload = objectMapper.readTree(paymentProcessedEvent).get("payload");
+            String orderId = paymentProcessedEvent.getOrderId();
 
-            String orderId = domaineEventPayload.get("orderId").asText();
-
-            boolean processed = eventIdempotencyService.processOnce(eventId, () -> {
+            boolean processed = eventIdempotencyService.processOnce("reservation-confirmation-order-" + orderId, () -> {
                 try {
                     stockReservationService.confirmReservation(UUID.fromString(orderId));
                 } catch (InsufficientStockException e) {

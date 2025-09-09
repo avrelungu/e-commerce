@@ -49,10 +49,6 @@ public interface OrderEventMapper {
                 .build();
     }
 
-    default long map(LocalDateTime localDateTime) {
-        return localDateTime.toInstant(ZoneOffset.UTC).toEpochMilli();
-    }
-
     default List<OrderItem> map(List<com.example.order_service.model.OrderItem> orderItems) {
         return orderItems.stream()
                 .map(orderItem -> OrderItem.newBuilder()
@@ -63,45 +59,5 @@ public interface OrderEventMapper {
                         .setUnitPrice(map(orderItem.getUnitPrice()))
                         .build())
                 .toList();
-    }
-
-    default OrderCreatedEventDto toDto(OrderCreatedEvent avroEvent) {
-        return new OrderCreatedEventDto(
-            avroEvent.getOrderId(),
-            avroEvent.getOrderNumber(),
-            avroEvent.getCustomerId(),
-            avroEvent.getItems().stream().map(this::toDto).toList(),
-            toDto(avroEvent.getTotalAmount()),
-            toDto(avroEvent.getTaxAmount()),
-            toDto(avroEvent.getShippingAmount()),
-            toDtoAddress(avroEvent.getShippingAddress())
-        );
-    }
-
-    default OrderItemDto toDto(OrderItem avroItem) {
-        return new OrderItemDto(
-            avroItem.getProductId(),
-            avroItem.getProductName(),
-            avroItem.getQuantity(),
-            toDto(avroItem.getUnitPrice()),
-            toDto(avroItem.getTotalPrice())
-        );
-    }
-
-    default MoneyDto toDto(Money avroMoney) {
-        return new MoneyDto(
-                avroMoney.getAmount(),
-                avroMoney.getCurrency()
-        );
-    }
-
-    default com.example.order_service.dto.event.AddressDto toDtoAddress(Address avroAddress) {
-        return new com.example.order_service.dto.event.AddressDto(
-            avroAddress.getStreet(),
-            avroAddress.getCity(),
-            avroAddress.getState(),
-            avroAddress.getZipCode(),
-            avroAddress.getCountry()
-        );
     }
 }

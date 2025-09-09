@@ -1,11 +1,11 @@
 package com.example.inventory_service.event;
 
-import com.example.inventory_service.dto.event.OutOfStockEventDto;
+import com.example.events.inventory.OutOfStockEvent;
 
 public class OutOfStock extends DomainEvent {
     private final String insufficientStockTopic;
 
-    public OutOfStock(String insufficientStockTopic, OutOfStockEventDto stockReservedEventDto, String orderId) {
+    public OutOfStock(String insufficientStockTopic, OutOfStockEvent stockReservedEventDto, String orderId) {
         super(stockReservedEventDto, orderId);
 
         this.insufficientStockTopic = insufficientStockTopic;

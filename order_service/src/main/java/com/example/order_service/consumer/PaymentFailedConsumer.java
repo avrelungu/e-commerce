@@ -15,7 +15,6 @@ public class PaymentFailedConsumer {
             String orderId = paymentFailedEvent.getOrderId();
 
             log.info("payment failed for order {} domainEventPayload: {}", orderId, paymentFailedEvent);
-
         } catch (Exception e) {
             log.error("payment failed", e);
         }

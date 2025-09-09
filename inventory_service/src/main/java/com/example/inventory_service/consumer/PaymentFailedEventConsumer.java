@@ -29,7 +29,7 @@ public class PaymentFailedEventConsumer {
         try {
             String orderId = paymentFailedEvent.getOrderId();
 
-            boolean processed = eventIdempotencyService.processOnce(orderId, () -> {
+            boolean processed = eventIdempotencyService.processOnce("release-stock-order-" + orderId, () -> {
                 stockReservationService.releaseReservation(UUID.fromString(orderId));
                 log.info("Reservation has been released for orderId: {}", orderId);
             });

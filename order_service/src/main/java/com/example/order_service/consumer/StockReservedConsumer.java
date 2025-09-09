@@ -55,7 +55,7 @@ public class StockReservedConsumer {
 
             PaymentRequestEvent paymentRequestEvent = paymentRequestMapper.toPaymentRequestEvent(order.get());
 
-            eventPublisher.publish(new PaymentRequest(paymentRequestTopic, orderId, paymentRequestEvent));
+            eventPublisher.publish(new PaymentRequest(paymentRequestTopic, paymentRequestEvent, orderId));
         } catch (AppException e) {
             throw new RuntimeException(e);
         } catch (Exception e) {

@@ -5,11 +5,8 @@ import com.example.events.payment.PaymentFailureReason;
 import com.example.events.payment.PaymentMethod;
 import com.example.events.payment.PaymentProcessedEvent;
 import com.example.events.payment.PaymentRequestEvent;
-import com.example.payment_service.dto.event.PaymentFailedEventDto;
-import com.example.payment_service.dto.event.PaymentProcessedEventDto;
 import com.example.payment_service.event.PaymentRequestFailed;
 import com.example.payment_service.event.PaymentRequestProcessed;
-import com.example.payment_service.mapper.PaymentRequestMapper;
 import com.example.payment_service.model.Payment;
 import com.example.payment_service.publisher.EventPublisher;
 import com.example.payment_service.repository.PaymentRepository;
@@ -38,15 +35,16 @@ public class PaymentService {
     @Value("#{kafkaTopics.paymentFailed}")
     private String paymentRequestFailedTopic;
 
-    private final PaymentRequestMapper paymentRequestMapper;
     private final EventPublisher eventPublisher;
 
     private final Random random = new Random();
     private final PaymentRepository paymentRepository;
 
-    public PaymentService(PaymentRepository paymentRepository, PaymentRequestMapper paymentRequestMapper, EventPublisher eventPublisher) {
+    public PaymentService(
+            PaymentRepository paymentRepository,
+            EventPublisher eventPublisher
+    ) {
         this.paymentRepository = paymentRepository;
-        this.paymentRequestMapper = paymentRequestMapper;
         this.eventPublisher = eventPublisher;
     }
 
@@ -147,15 +145,15 @@ public class PaymentService {
         };
     }
 
-    private void handlePaymentSuccess(Payment payment, PaymentRequestEvent request, TokenInfo tokenInfo) {
+    private void handlePaymentSuccess(Payment payment, PaymentRequestEvent paymentRequestEvent, TokenInfo tokenInfo) {
         payment.setStatus(Payment.PaymentStatus.COMPLETED);
         payment.setTransactionId("txn_" + System.currentTimeMillis());
         payment.setUpdatedAt(LocalDateTime.now());
         paymentRepository.save(payment);
 
-        PaymentProcessedEventDto paymentProcessedEventDto = createSuccessEvent(request, tokenInfo, payment.getTransactionId());
+        PaymentProcessedEvent paymentProcessedEvent = createSuccessEvent(paymentRequestEvent, tokenInfo, payment.getTransactionId());
 
-        eventPublisher.publish(new PaymentRequestProcessed(paymentRequestProcessedTopic, payment.getOrderId().toString(), paymentProcessedEventDto));
+        eventPublisher.publish(new PaymentRequestProcessed(paymentRequestProcessedTopic, paymentProcessedEvent, payment.getOrderId().toString()));
     }
 
     private void handlePaymentFailure(
@@ -168,17 +166,17 @@ public class PaymentService {
         payment.setUpdatedAt(LocalDateTime.now());
         paymentRepository.save(payment);
 
-        PaymentFailedEventDto paymentFailedEventDto = createFailureEvent(request, reason, payment.getRetryCount());
+        PaymentFailedEvent paymentFailedEvent = createFailureEvent(request, reason, payment.getRetryCount());
 
-        eventPublisher.publish(new PaymentRequestFailed(paymentRequestFailedTopic, payment.getOrderId().toString(), paymentFailedEventDto));
+        eventPublisher.publish(new PaymentRequestFailed(paymentRequestFailedTopic, paymentFailedEvent, payment.getOrderId().toString()));
     }
 
-    private PaymentProcessedEventDto createSuccessEvent(
+    private PaymentProcessedEvent createSuccessEvent(
             PaymentRequestEvent request,
             TokenInfo tokenInfo,
             String transactionId
     ) {
-        PaymentProcessedEvent paymentProcessedEvent = PaymentProcessedEvent.newBuilder()
+        return PaymentProcessedEvent.newBuilder()
                 .setPaymentId("pay_" + UUID.randomUUID().toString().replace("-", "").substring(0, 16))
                 .setOrderId(request.getOrderId())
                 .setAmount(request.getAmount())
@@ -187,24 +185,20 @@ public class PaymentService {
                 .setLastFourDigits(tokenInfo.last4)
                 .setCardBrand(tokenInfo.brand)
                 .build();
-
-        return paymentRequestMapper.toPaymentProcessedEventDto(paymentProcessedEvent);
     }
 
-    private PaymentFailedEventDto createFailureEvent(
+    private PaymentFailedEvent createFailureEvent(
             PaymentRequestEvent request,
             PaymentFailureReason reason,
             int retryCount
     ) {
-        PaymentFailedEvent paymentFailedEvent = PaymentFailedEvent.newBuilder()
+        return PaymentFailedEvent.newBuilder()
                 .setOrderId(request.getOrderId())
                 .setAmount(request.getAmount())
                 .setFailureReason(reason)
                 .setAttemptNumber(retryCount)
                 .setMaxAttempts(maximumNumberOfRetries)
                 .build();
-
-        return paymentRequestMapper.toPaymentFailedEventDto(paymentFailedEvent);
     }
 
     private void simulateProcessingTime() {

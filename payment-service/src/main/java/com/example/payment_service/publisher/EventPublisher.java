@@ -1,12 +1,6 @@
 package com.example.payment_service.publisher;
 
-import com.example.events.payment.PaymentFailedEvent;
-import com.example.events.payment.PaymentProcessedEvent;
-import com.example.payment_service.dto.event.PaymentProcessedEventDto;
 import com.example.payment_service.event.DomainEvent;
-import com.example.payment_service.event.PaymentRequestProcessed;
-import com.example.payment_service.mapper.PaymentRequestMapper;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -15,14 +9,11 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class EventPublisher {
     private final KafkaTemplate<String, Object> kafkaTemplate;
-    private final ObjectMapper objectMapper;
 
     public EventPublisher(
-            KafkaTemplate<String, Object> kafkaTemplate,
-            ObjectMapper objectMapper,
-            PaymentRequestMapper paymentRequestMapper) {
+            KafkaTemplate<String, Object> kafkaTemplate
+    ) {
         this.kafkaTemplate = kafkaTemplate;
-        this.objectMapper = objectMapper;
     }
 
     public void publish(DomainEvent event) {

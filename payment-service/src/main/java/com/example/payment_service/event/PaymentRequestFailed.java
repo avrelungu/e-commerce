@@ -1,9 +1,11 @@
 package com.example.payment_service.event;
 
-public class PaymentRequestFailed extends DomainEvent {
-    private String paymentFailedTopic;
+import com.example.events.payment.PaymentFailedEvent;
 
-    public PaymentRequestFailed(String paymentFailedTopic, String orderId, Object payload) {
+public class PaymentRequestFailed extends DomainEvent {
+    private final String paymentFailedTopic;
+
+    public PaymentRequestFailed(String paymentFailedTopic, PaymentFailedEvent payload, String orderId) {
         super(payload, orderId);
         this.paymentFailedTopic = paymentFailedTopic;
     }

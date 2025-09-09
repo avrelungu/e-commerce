@@ -27,7 +27,7 @@ public class OrderPaymentEventConsumer {
             String eventId = paymentRequest.getOrderId();
 
             boolean processed = eventIdempotencyService.processOnce(
-                    eventId,
+                    "payment-request-order-" + eventId,
                     () -> paymentService.processPayment(paymentRequest)
             );
 

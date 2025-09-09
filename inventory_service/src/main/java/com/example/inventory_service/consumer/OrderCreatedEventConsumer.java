@@ -1,8 +1,8 @@
 package com.example.inventory_service.consumer;
 
+import com.example.events.inventory.StockReservedEvent;
 import com.example.events.order.OrderCreatedEvent;
 import com.example.inventory_service.dto.ReservationRequestDto;
-import com.example.inventory_service.dto.event.StockReservedEventDto;
 import com.example.inventory_service.event.StockReserved;
 import com.example.inventory_service.exception.InsufficientStockException;
 import com.example.inventory_service.mapper.StockReservationMapper;
@@ -49,7 +49,7 @@ public class OrderCreatedEventConsumer {
 
         log.info("Received orderCreated eventId {}", eventId);
 
-        boolean processed = eventIdempotencyService.processOnce(eventId, () -> {
+        boolean processed = eventIdempotencyService.processOnce("stock-reservation-order-" + eventId, () -> {
             try {
 
                 String orderId = orderCreatedEvent.getOrderId();
@@ -69,16 +69,12 @@ public class OrderCreatedEventConsumer {
                 );
 
                 if (!reservations.isEmpty()) {
-                    log.info("Stock reservation successful for order: {}", orderCreatedEvent.getOrderId());
-                    com.example.events.inventory.StockReservedEvent stockReservedEvent = stockReservationMapper.toStockReservedEvent(reservations, orderId);
+                    StockReservedEvent stockReservedEvent = stockReservationMapper.toStockReservedEvent(reservations, orderId);
 
-                    StockReservedEventDto stockReservedEventDto = stockReservationMapper.toStockReservedEventDto(stockReservedEvent);
-
-                    eventPublisher.publish(new StockReserved(stockReservedTopic, stockReservedEventDto, orderId));
+                    eventPublisher.publish(new StockReserved(stockReservedTopic, stockReservedEvent, orderId));
                 }
             } catch (Exception | InsufficientStockException e) {
                 log.error("Error processing order created event", e);
-                // TODO cancel order with insufficient stock
             }
         });
 

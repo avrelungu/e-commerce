@@ -3,7 +3,6 @@ package com.example.order_service.service;
 import com.example.order_service.dto.CreateOrderDto;
 import com.example.order_service.dto.OrderDto;
 import com.example.order_service.dto.OrderItemDto;
-import com.example.order_service.dto.event.OrderCreatedEventDto;
 import com.example.order_service.event.OrderCreated;
 import com.example.order_service.exceptions.AppException;
 import com.example.order_service.mapper.OrderEventMapper;

@@ -169,7 +169,7 @@ public class NotificationService {
     }
 
     // Retry failed notifications periodically
-    @Scheduled(fixedDelay = 60000) // Every 1 minute
+//    @Scheduled(fixedDelay = 60000)
     public void retryFailedNotifications() {
         List<Notification> failedNotifications = notificationRepository.findFailedNotificationsForRetry();
 

@@ -4,8 +4,6 @@ import com.example.events.inventory.OutOfStockEvent;
 import com.example.events.inventory.StockReservedEvent;
 import com.example.inventory_service.dto.ReservationRequestDto;
 import com.example.inventory_service.dto.StockReservationDto;
-import com.example.inventory_service.dto.event.OutOfStockEventDto;
-import com.example.inventory_service.dto.event.StockReservedEventDto;
 import com.example.inventory_service.model.StockReservation;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -50,8 +48,4 @@ public interface StockReservationMapper {
     default long map(LocalDateTime localDateTime) {
         return localDateTime.toInstant(ZoneOffset.UTC).toEpochMilli();
     }
-
-    StockReservedEventDto toStockReservedEventDto(StockReservedEvent stockReservationDto);
-
-    OutOfStockEventDto toOutOfStockEventDto(OutOfStockEvent outOfStockEvent);
 }

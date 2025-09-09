@@ -2,7 +2,6 @@ package com.example.inventory_service.service;
 
 import com.example.events.inventory.OutOfStockEvent;
 import com.example.inventory_service.dto.ReservationRequestDto;
-import com.example.inventory_service.dto.event.OutOfStockEventDto;
 import com.example.inventory_service.event.OutOfStock;
 import com.example.inventory_service.exception.InsufficientStockException;
 import com.example.inventory_service.mapper.StockReservationMapper;
@@ -65,11 +64,11 @@ public class StockReservationService {
 
                     OutOfStockEvent outOfStockEvent = stockReservationMapper.toOutOfStockEvent(request, orderId, getAvailableStock(request.getProductId()));
 
-                    OutOfStockEventDto outOfStockEventDto = stockReservationMapper.toOutOfStockEventDto(outOfStockEvent);
+                    eventPublisher.publish(new OutOfStock(outOfStockTopic, outOfStockEvent, String.valueOf(orderId)));
 
-                    eventPublisher.publish(new OutOfStock(outOfStockTopic, outOfStockEventDto, String.valueOf(orderId)));
+                    log.error("Insufficient stock for product {}", request.getProductId() );
 
-                    throw new InsufficientStockException("Insufficient Stock for product " + request.getProductId(), HttpStatus.BAD_REQUEST);
+                    return new ArrayList<>();
                 }
             }
 
@@ -83,7 +82,7 @@ public class StockReservationService {
             log.info("Successfully reserved stock for order: {}", orderId);
             return createdReservations;
 
-        } catch (Exception | InsufficientStockException e) {
+        } catch (Exception e) {
             log.error("Error reserving stock for order: {}", orderId, e);
             throw e;
         }
