@@ -18,4 +18,5 @@ public class KafkaTopics {
     private String orderShipped;
     private String orderDelivered;
     private String shipmentTrackingUpdate;
+    private String lowStockAlert;
 }

@@ -87,3 +87,125 @@ services:
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka:29092'
       SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+
+  # Application Services
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATA_REDIS_HOST: redis
+    depends_on:
+      - redis
+      - order-service
+      - inventory-service
+      - payment-service
+      - shipping-service
+      - notification-service
+    networks:
+      - ecommerce-network
+      
+  order-service:
+    build: ./order_service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-order:5432/order_service
+      SPRING_DATASOURCE_USERNAME: myuser
+      SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SPRING_DATA_REDIS_HOST: redis
+      SCHEMA_REGISTRY_URL: http://schema-registry:8081
+    depends_on:
+      - postgres-order
+      - kafka
+      - redis
+      - schema-registry
+    networks:
+      - ecommerce-network
+      
+  inventory-service:
+    build: ./inventory_service
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-inventory:5432/inventory_service
+      SPRING_DATASOURCE_USERNAME: myuser
+      SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SPRING_DATA_REDIS_HOST: redis
+      SCHEMA_REGISTRY_URL: http://schema-registry:8081
+    depends_on:
+      - postgres-inventory
+      - kafka
+      - redis
+      - schema-registry
+    networks:
+      - ecommerce-network
+      
+  payment-service:
+    build: ./payment-service
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-payment:5432/payment_service
+      SPRING_DATASOURCE_USERNAME: myuser
+      SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SPRING_DATA_REDIS_HOST: redis
+      SCHEMA_REGISTRY_URL: http://schema-registry:8081
+    depends_on:
+      - postgres-payment
+      - kafka
+      - redis
+      - schema-registry
+    networks:
+      - ecommerce-network
+      
+  shipping-service:
+    build: ./shipping-service
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-shipping:5432/shipping_service
+      SPRING_DATASOURCE_USERNAME: myuser
+      SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SPRING_DATA_REDIS_HOST: redis
+      SCHEMA_REGISTRY_URL: http://schema-registry:8081
+    depends_on:
+      - postgres-shipping
+      - kafka
+      - redis
+      - schema-registry
+    networks:
+      - ecommerce-network
+      
+  notification-service:
+    build: ./notification-service
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-notifications:5432/notification_service
+      SPRING_DATASOURCE_USERNAME: myuser
+      SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SPRING_DATA_REDIS_HOST: redis
+      SCHEMA_REGISTRY_URL: http://schema-registry:8081
+    depends_on:
+      - postgres-notifications
+      - kafka
+      - redis
+      - schema-registry
+    networks:
+      - ecommerce-network
+
+networks:
+  ecommerce-network:
+    driver: bridge

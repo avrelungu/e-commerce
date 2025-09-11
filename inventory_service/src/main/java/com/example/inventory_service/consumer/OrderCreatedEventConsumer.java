@@ -49,7 +49,7 @@ public class OrderCreatedEventConsumer {
 
         log.info("Received orderCreated eventId {}", eventId);
 
-        boolean processed = eventIdempotencyService.processOnce("stock-reservation-order-" + eventId, () -> {
+    boolean processed = eventIdempotencyService.processOnce("stock-reservation-order-" + eventId, () -> {
             try {
 
                 String orderId = orderCreatedEvent.getOrderId();

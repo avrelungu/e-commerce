@@ -9,6 +9,7 @@ import com.example.order_service.mapper.PaymentRequestMapper;
 import com.example.order_service.model.Order;
 import com.example.order_service.publisher.EventPublisher;
 import com.example.order_service.repository.OrderRepository;
+import com.example.order_service.service.OrderStateService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -23,19 +24,22 @@ import java.util.UUID;
 public class StockReservedConsumer {
     private final EventPublisher eventPublisher;
     private final PaymentRequestMapper paymentRequestMapper;
+    private final OrderRepository orderRepository;
+    private final OrderStateService orderStateService;
+    
     @Value("#{kafkaTopics.paymentRequest}")
     private String paymentRequestTopic;
-
-    private final OrderRepository orderRepository;
 
     public StockReservedConsumer(
             OrderRepository orderRepository,
             EventPublisher eventPublisher,
-            PaymentRequestMapper paymentRequestMapper
+            PaymentRequestMapper paymentRequestMapper,
+            OrderStateService orderStateService
     ) {
         this.orderRepository = orderRepository;
         this.eventPublisher = eventPublisher;
         this.paymentRequestMapper = paymentRequestMapper;
+        this.orderStateService = orderStateService;
     }
 
     @KafkaListener(topics = "#{kafkaTopics.stockReserved}", groupId = "order-service-inventory-processor")
@@ -49,9 +53,8 @@ public class StockReservedConsumer {
                 throw new AppException("Order not found", HttpStatus.NOT_FOUND);
             }
 
-            order.get().setStatus(String.valueOf(OrderStatus.CONFIRMED));
-
-            orderRepository.save(order.get());
+            // Use state machine to update order status
+            orderStateService.updateOrderStatus(order.get(), OrderStatus.CONFIRMED);
 
             PaymentRequestEvent paymentRequestEvent = paymentRequestMapper.toPaymentRequestEvent(order.get());
 

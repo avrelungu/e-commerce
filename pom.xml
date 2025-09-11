@@ -38,6 +38,7 @@
 	<modules>
 		<module>shared-common</module>
 		<module>shared-events</module>
+		<module>api-gateway</module>
 		<module>order_service</module>
 		<module>inventory_service</module>
 		<module>payment-service</module>
@@ -134,6 +135,13 @@
 		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-core</artifactId>
+		</dependency>
+
+		<!-- Swagger/OpenAPI Documentation -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.2.0</version>
 		</dependency>
 	</dependencies>
 

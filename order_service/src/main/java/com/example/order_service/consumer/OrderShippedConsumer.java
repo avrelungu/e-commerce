@@ -3,6 +3,7 @@ package com.example.order_service.consumer;
 import com.example.order_service.enums.OrderStatus;
 import com.example.order_service.model.Order;
 import com.example.order_service.repository.OrderRepository;
+import com.example.order_service.service.OrderStateService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -17,10 +18,12 @@ import java.util.UUID;
 public class OrderShippedConsumer {
     private final ObjectMapper objectMapper;
     private final OrderRepository orderRepository;
+    private final OrderStateService orderStateService;
 
-    public OrderShippedConsumer(ObjectMapper objectMapper, OrderRepository orderRepository) {
+    public OrderShippedConsumer(ObjectMapper objectMapper, OrderRepository orderRepository, OrderStateService orderStateService) {
         this.objectMapper = objectMapper;
         this.orderRepository = orderRepository;
+        this.orderStateService = orderStateService;
     }
 
     @KafkaListener(topics = "#{kafkaTopics.orderShipped}")
@@ -38,9 +41,7 @@ public class OrderShippedConsumer {
                 return;
             }
 
-            order.get().setStatus(OrderStatus.SHIPPED.name());
-
-            orderRepository.save(order.get());
+            orderStateService.updateOrderStatus(order.get(), OrderStatus.SHIPPED);
         } catch (Exception e) {
             log.error("Order shipped consumer failed: {}", e.getMessage());
         }
