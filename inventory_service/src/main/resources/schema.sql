@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS inventory_service.products(
     category VARCHAR(100),
     image_url VARCHAR(500),
     active BOOLEAN DEFAULT TRUE,
+    low_stock_threshold INTEGER NOT NULL DEFAULT 10,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

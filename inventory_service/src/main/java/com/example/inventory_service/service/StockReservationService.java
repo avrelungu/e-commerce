@@ -36,19 +36,22 @@ public class StockReservationService {
     private final ProductRepository productRepository;
     private final StockReservationMapper stockReservationMapper;
     private final EventPublisher eventPublisher;
+    private final StockAlertService stockAlertService;
 
     public StockReservationService(
             StockReservationRepository stockReservationRepository,
             InventoryRepository inventoryRepository,
             ProductRepository productRepository,
             StockReservationMapper stockReservationMapper,
-            EventPublisher eventPublisher
+            EventPublisher eventPublisher,
+            StockAlertService stockAlertService
     ) {
         this.stockReservationRepository = stockReservationRepository;
         this.inventoryRepository = inventoryRepository;
         this.productRepository = productRepository;
         this.stockReservationMapper = stockReservationMapper;
         this.eventPublisher = eventPublisher;
+        this.stockAlertService = stockAlertService;
     }
 
     @Retry(name = "inventory-stock-reservation")
@@ -77,6 +80,14 @@ public class StockReservationService {
                 StockReservation reservation = createReservation(orderId, request.getProductId(), request.getQuantity());
                 createdReservations.add(reservation);
                 updateInventoryReservedQuantity(request.getProductId(), request.getQuantity());
+                
+                // Check for low stock after reservation
+                Product product = productRepository.findById(request.getProductId())
+                    .orElseThrow(() -> new RuntimeException("Product not found: " + request.getProductId()));
+                Inventory inventory = inventoryRepository.findByProductId(request.getProductId())
+                    .orElseThrow(() -> new RuntimeException("Inventory not found for product: " + request.getProductId()));
+                
+                stockAlertService.checkAndAlertLowStock(product, inventory);
             }
 
             log.info("Successfully reserved stock for order: {}", orderId);

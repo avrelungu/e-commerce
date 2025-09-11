@@ -14,4 +14,5 @@ public class KafkaTopics {
     private String outOfStock;
     private String paymentFailed;
     private String paymentProcessed;
+    private String lowStockAlert;
 }

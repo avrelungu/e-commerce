@@ -88,5 +88,37 @@
         "type": "int"
       }
     ]
+  },
+  {
+    "namespace": "com.example.events.inventory",
+    "type": "record",
+    "name": "LowStockAlertEvent",
+    "fields": [
+      {
+        "name": "productId",
+        "type": "string"
+      },
+      {
+        "name": "sku",
+        "type": "string"
+      },
+      {
+        "name": "productName",
+        "type": "string"
+      },
+      {
+        "name": "currentQuantity",
+        "type": "int"
+      },
+      {
+        "name": "threshold",
+        "type": "int"
+      },
+      {
+        "name": "timestamp",
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    ]
   }
 ]

@@ -36,6 +36,9 @@ public class Product {
     @Column(name = "active", nullable = false)
     private Boolean active = true;
 
+    @Column(name = "low_stock_threshold", nullable = false)
+    private Integer lowStockThreshold = 10;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
