@@ -70,12 +70,12 @@ public class OrderService {
                 orderDto.getCustomerId(), orderDto.getItems().size());
                 
             Order order = buildOrder(orderDto);
-            
-            // Add orderId to MDC once available
+
+            orderRepository.save(order);
+
+            // Add orderId to MDC after save (when ID is generated)
             MDC.put("orderId", order.getId().toString());
             MDC.put("orderNumber", order.getOrderNumber());
-            
-            orderRepository.save(order);
             log.info("💾 Order persisted to database: {} (orderNumber: {})", 
                 order.getId(), order.getOrderNumber());
 

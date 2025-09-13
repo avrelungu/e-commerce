@@ -113,3 +113,31 @@ resilience4j:
         failure-rate-threshold: 60
         wait-duration-in-open-state: 30s
         minimum-number-of-calls: 5
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+  sql:
+    init:
+      mode: always
+
+  datasource:
+    url: jdbc:postgresql://postgres-payment:5432/payment_service
+    username: myuser
+    password: secret
+
+  data:
+    redis:
+      host: redis
+
+  kafka:
+    bootstrap-servers: kafka:29092
+    producer:
+      properties:
+        schema.registry.url: http://schema-registry:8081
+    consumer:
+      properties:
+        schema.registry.url: http://schema-registry:8081

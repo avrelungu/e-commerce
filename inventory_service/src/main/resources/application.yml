@@ -93,3 +93,31 @@ management:
   endpoint:
     health:
       show-details: always
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+  sql:
+    init:
+      mode: always
+
+  datasource:
+    url: jdbc:postgresql://postgres-inventory:5432/inventory_service
+    username: myuser
+    password: secret
+
+  data:
+    redis:
+      host: redis
+
+  kafka:
+    bootstrap-servers: kafka:29092
+    producer:
+      properties:
+        schema.registry.url: http://schema-registry:8081
+    consumer:
+      properties:
+        schema.registry.url: http://schema-registry:8081

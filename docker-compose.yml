@@ -5,6 +5,8 @@ services:
     image: redis:7-alpine
     ports:
       - "6379:6379"
+    networks:
+      - ecommerce-network
 
   postgres-order:
     image: postgres:15-alpine
@@ -14,6 +16,8 @@ services:
       POSTGRES_DB: order_service
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: secret
+    networks:
+      - ecommerce-network
       
   postgres-inventory:
     image: postgres:15-alpine
@@ -23,6 +27,8 @@ services:
       POSTGRES_DB: inventory_service
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: secret
+    networks:
+      - ecommerce-network
 
   postgres-payment:
     image: 'postgres:latest'
@@ -32,6 +38,8 @@ services:
       - 'POSTGRES_USER=myuser'
     ports:
       - '5434:5432'
+    networks:
+      - ecommerce-network
 
   postgres-shipping:
     image: 'postgres:latest'
@@ -41,6 +49,8 @@ services:
       - 'POSTGRES_USER=myuser'
     ports:
       - '5435:5432'
+    networks:
+      - ecommerce-network
 
   postgres-notifications:
     image: 'postgres:latest'
@@ -50,6 +60,8 @@ services:
       - 'POSTGRES_USER=myuser'
     ports:
       - '5436:5432'
+    networks:
+      - ecommerce-network
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
@@ -59,6 +71,8 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - ecommerce-network
 
   kafka:
     image: confluentinc/cp-kafka:7.4.0
@@ -75,6 +89,8 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    networks:
+      - ecommerce-network
 
   schema-registry:
     image: confluentinc/cp-schema-registry:7.4.0
@@ -87,6 +103,8 @@ services:
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka:29092'
       SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+    networks:
+      - ecommerce-network
 
   api-gateway:
     build: ./api-gateway

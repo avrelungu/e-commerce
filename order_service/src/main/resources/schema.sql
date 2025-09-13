@@ -1,6 +1,6 @@
 CREATE SCHEMA order_service;
 
-CREATE TABLE order_service.orders(
+CREATE TABLE IF NOT EXISTS order_service.orders(
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_number VARCHAR(30) UNIQUE,
     customer_id UUID,
@@ -20,7 +20,7 @@ CREATE TABLE order_service.orders(
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE order_service.order_items(
+CREATE TABLE IF NOT EXISTS order_service.order_items(
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id UUID REFERENCES order_service.orders(id),
     product_id UUID,
@@ -30,7 +30,7 @@ CREATE TABLE order_service.order_items(
     total_price DECIMAL(10, 2)
 );
 
-CREATE TABLE order_service.order_events(
+CREATE TABLE IF NOT EXISTS order_service.order_events(
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id UUID REFERENCES order_service.orders(id),
     event_type VARCHAR(50),

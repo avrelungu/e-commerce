@@ -57,3 +57,25 @@ kafka:
 
 server:
   port: 8084
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+  sql:
+    init:
+      mode: always
+
+  datasource:
+    url: jdbc:postgresql://postgres-shipping:5432/shipping_service
+    username: myuser
+    password: secret
+
+  data:
+    redis:
+      host: redis
+
+  kafka:
+    bootstrap-servers: kafka:29092
