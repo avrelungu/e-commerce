@@ -4,8 +4,11 @@ server:
 spring:
   application:
     name: api-gateway
-    
+  main:
+    web-application-type: reactive
   cloud:
+    compatibility-verifier:
+      enabled: false
     gateway:
       routes:
         - id: order-service
@@ -70,11 +73,6 @@ spring:
                 redis-rate-limiter.replenishRate: 20
                 redis-rate-limiter.burstCapacity: 40
                 key-resolver: "#{@userKeyResolver}"
-            
-      default-filters:
-        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
-        - AddResponseHeader=X-Gateway-Response-Time, #{T(System).currentTimeMillis()}
-        - AddResponseHeader=X-Gateway-Version, 1.0.0
         
   data:
     redis:

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <springProfile name="!docker">
+        <!-- Local Development -->
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level [ORDER-SERVICE] [%X{correlationId:-}] %logger{36} - %msg%n</pattern>
+            </encoder>
+        </appender>
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+    
+    <springProfile name="docker">
+        <!-- Docker/Production -->
+        <appender name="GELF" class="de.siegmar.logbackgelf.GelfUdpAppender">
+            <graylogHost>graylog</graylogHost>
+            <graylogPort>12201</graylogPort>
+            <includeFullMdc>true</includeFullMdc>
+            <includeMarker>true</includeMarker>
+            <shortMessagePattern>%m</shortMessagePattern>
+            <fullMessagePattern>%logger - %msg%n</fullMessagePattern>
+            <facility>order-service</facility>
+            <staticField>service_name:order-service</staticField>
+            <staticField>service_port:8081</staticField>
+            <staticField>environment:${SPRING_PROFILES_ACTIVE:-docker}</staticField>
+        </appender>
+        
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level [ORDER-SERVICE] [%X{correlationId:-}] %logger{36} - %msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="GELF"/>
+        </root>
+    </springProfile>
+    
+    <!-- Enhanced logging for our application -->
+    <logger name="com.example.order_service" level="DEBUG"/>
+    <logger name="org.springframework.kafka" level="WARN"/>
+</configuration>

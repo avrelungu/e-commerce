@@ -32,21 +32,18 @@ public class OrderStateService {
     
     @Transactional
     public void updateOrderStatus(Order order, OrderStatus newStatus) {
-        OrderStatus currentStatus = order.getStatus();
+        OrderStatus currentStatus = OrderStatus.valueOf(order.getStatus());
         
         if (currentStatus == newStatus) {
             log.debug("Order {} already in status {}", order.getId(), newStatus);
             return;
         }
-        
-        // Validate state transition
+
         orderStateMachine.validateTransition(order, newStatus);
-        
-        // Update order status
-        order.setStatus(newStatus);
+
+        order.setStatus(String.valueOf(newStatus));
         order.setUpdatedAt(LocalDateTime.now());
-        
-        // Add any additional status-specific logic here
+
         switch (newStatus) {
             case CONFIRMED:
                 log.info("Order {} confirmed - stock reserved", order.getId());

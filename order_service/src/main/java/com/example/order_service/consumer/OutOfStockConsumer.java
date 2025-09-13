@@ -22,7 +22,7 @@ public class OutOfStockConsumer {
     }
 
     @KafkaListener(topics = "#{kafkaTopics.outOfStock}")
-    private void outOfStockConsumer(OutOfStockEvent outOfStockEvent) {
+    void outOfStockConsumer(OutOfStockEvent outOfStockEvent) {
         try {
             String orderId = outOfStockEvent.getOrderId();
 

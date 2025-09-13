@@ -32,7 +32,8 @@
 		<mapstruct.version>1.6.2</mapstruct.version>
 		<mockito.version>5.14.2</mockito.version>
 		<lombok.version>1.18.34</lombok.version>
-		<resilience4j.version>2.2.0</resilience4j.version>
+		<resilience4j.version>2.0.2</resilience4j.version>
+		<spring-boot.version>3.5.4</spring-boot.version>
 	</properties>
 
 	<modules>
@@ -65,6 +66,24 @@
 		<dependency>
 			<groupId>org.springframework.kafka</groupId>
 			<artifactId>spring-kafka</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>de.siegmar</groupId>
+			<artifactId>logback-gelf</artifactId>
+			<version>4.0.2</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.logstash.logback</groupId>
+			<artifactId>logstash-logback-encoder</artifactId>
+			<version>7.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+			<version>${spring-boot.version}</version>
 		</dependency>
 
 		<dependency>
@@ -112,19 +131,6 @@
 			<version>7.4.0</version>
 		</dependency>
 
-		<!-- Resilience4j Dependencies -->
-		<dependency>
-			<groupId>io.github.resilience4j</groupId>
-			<artifactId>resilience4j-spring-boot3</artifactId>
-			<version>${resilience4j.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>io.github.resilience4j</groupId>
-			<artifactId>resilience4j-micrometer</artifactId>
-			<version>${resilience4j.version}</version>
-		</dependency>
-
 		<!-- Spring Boot Actuator for Health Checks & Metrics -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -142,6 +148,19 @@
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>2.2.0</version>
+		</dependency>
+
+		<!-- Resilience4j Dependencies -->
+		<dependency>
+			<groupId>io.github.resilience4j</groupId>
+			<artifactId>resilience4j-spring-boot3</artifactId>
+			<version>${resilience4j.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.github.resilience4j</groupId>
+			<artifactId>resilience4j-micrometer</artifactId>
+			<version>${resilience4j.version}</version>
 		</dependency>
 	</dependencies>
 

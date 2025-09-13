@@ -88,7 +88,6 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka:29092'
       SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
 
-  # Application Services
   api-gateway:
     build: ./api-gateway
     ports:
@@ -206,6 +205,39 @@ services:
     networks:
       - ecommerce-network
 
+
+  mongo:
+    image: mongo:6.0
+    networks: [ graylog ]
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.21
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    networks: [ graylog ]
+
+  graylog:
+    image: graylog/graylog:5.1
+    ports:
+      - "9000:9000"    # Web UI
+      - "12201:12201"  # GELF UDP input
+      - "1514:1514"    # Syslog TCP input
+    environment:
+      GRAYLOG_PASSWORD_SECRET: somepasswordpepper
+      GRAYLOG_ROOT_PASSWORD_SHA2: 8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918  # admin
+      GRAYLOG_HTTP_EXTERNAL_URI: http://localhost:9000/
+      GRAYLOG_ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      GRAYLOG_MONGODB_URI: mongodb://mongo:27017/graylog
+    depends_on:
+      - mongo
+      - elasticsearch
+    networks: 
+      - graylog
+      - ecommerce-network
+
 networks:
   ecommerce-network:
+    driver: bridge
+  graylog:
     driver: bridge

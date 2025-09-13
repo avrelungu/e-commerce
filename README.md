@@ -170,4 +170,42 @@ You now have a **production-ready, event-driven e-commerce platform** that demon
 - ✅ Scalable architecture
 - ✅ Production deployment ready
 
+## 📊 **Centralized Logging with Graylog**
+
+### **Enterprise-Level Logging Stack**
+```
+Microservices → Structured Logs → Graylog → Search/Alerts/Dashboards
+```
+
+### **What You Get:**
+- ✅ **Correlation ID tracing** - Follow requests across all 6 services
+- ✅ **Structured logging** - JSON format with searchable fields
+- ✅ **Centralized aggregation** - All logs in one place (Graylog UI)
+- ✅ **Real-time monitoring** - Live log streaming and alerts
+- ✅ **Performance tracking** - Method timing and business metrics
+
+### **Quick Start:**
+```bash
+# 1. Start Graylog stack
+docker-compose up -d mongo elasticsearch graylog
+
+# 2. Access Graylog UI (wait 2 minutes for startup)
+open http://localhost:9000  # admin/admin
+
+# 3. Start services (logs auto-flow to Graylog)
+docker-compose up -d
+```
+
+### **Example Log Output:**
+```
+[order-service] [a1b2c3d4] 🛒 Starting order creation for customer: cust-123
+[order-service] [a1b2c3d4] 💾 Order persisted: order-456 (ORD-20240115-001)
+[inventory-service] [a1b2c3d4] 📦 Stock reserved for order: order-456
+[payment-service] [a1b2c3d4] 💳 Payment processed: order-456
+[shipping-service] [a1b2c3d4] 🚚 Shipment created: order-456
+[notification-service] [a1b2c3d4] 📱 SMS sent: Low stock alert
+```
+
+**📋 Detailed Setup**: See `/docs/LOGGING.md`
+
 **Ready to ship! 🚀**

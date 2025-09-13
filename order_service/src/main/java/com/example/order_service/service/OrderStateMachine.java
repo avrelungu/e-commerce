@@ -29,7 +29,7 @@ public class OrderStateMachine {
     }
     
     public void validateTransition(Order order, OrderStatus newStatus) {
-        if (!canTransition(order.getStatus(), newStatus)) {
+        if (!canTransition(OrderStatus.valueOf(order.getStatus()), newStatus)) {
             throw new IllegalStateException(
                 String.format("Invalid transition from %s to %s for order %s",
                     order.getStatus(), newStatus, order.getId())

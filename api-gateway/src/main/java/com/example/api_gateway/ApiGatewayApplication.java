@@ -2,12 +2,19 @@ package com.example.api_gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration;
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
 import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
 import org.springframework.context.annotation.Bean;
 import reactor.core.publisher.Mono;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = {
+    DataSourceAutoConfiguration.class, 
+    HibernateJpaAutoConfiguration.class,
+    WebMvcAutoConfiguration.class
+})
 public class ApiGatewayApplication {
     
     public static void main(String[] args) {
@@ -16,7 +23,7 @@ public class ApiGatewayApplication {
     
     @Bean
     public RedisRateLimiter redisRateLimiter() {
-        return new RedisRateLimiter(10, 20); // 10 requests per second, burst of 20
+        return new RedisRateLimiter(10, 20);
     }
     
     @Bean
